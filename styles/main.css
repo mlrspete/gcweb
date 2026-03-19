@@ -1157,6 +1157,15 @@ body.is-loading {
   color: var(--cta-field-placeholder);
 }
 
+.cta-form .field--select {
+  padding-right: 3.7rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  cursor: pointer;
+  text-overflow: ellipsis;
+}
+
 .cta-form .field:focus-visible {
   border-color: rgba(52, 209, 123, 0.46);
   box-shadow:
@@ -1165,9 +1174,47 @@ body.is-loading {
 }
 
 .cta-panel[data-mode="partner"] .field--select {
+  color-scheme: dark;
+  border-color: rgba(215, 255, 0, 0.18);
+  background-color: rgba(248, 248, 243, 0.08);
   background-image:
-    linear-gradient(45deg, transparent 50%, rgba(248, 248, 243, 0.72) 50%),
-    linear-gradient(135deg, rgba(248, 248, 243, 0.72) 50%, transparent 50%);
+    linear-gradient(45deg, transparent 50%, rgba(248, 248, 243, 0.82) 50%),
+    linear-gradient(135deg, rgba(248, 248, 243, 0.82) 50%, transparent 50%),
+    linear-gradient(180deg, rgba(215, 255, 0, 0.2), rgba(248, 248, 243, 0.08));
+  background-position:
+    calc(100% - 1.45rem) calc(50% - 0.12rem),
+    calc(100% - 1.12rem) calc(50% - 0.12rem),
+    calc(100% - 2.75rem) 50%;
+  background-size:
+    0.46rem 0.46rem,
+    0.46rem 0.46rem,
+    1px calc(100% - 1.1rem);
+  background-repeat: no-repeat;
+}
+
+.cta-panel[data-mode="partner"] .field--select:invalid {
+  color: rgba(248, 248, 243, 0.66);
+}
+
+.cta-panel[data-mode="partner"] .field--select:not(:invalid) {
+  color: rgba(248, 248, 243, 0.94);
+}
+
+.cta-panel[data-mode="partner"] .field--select:focus-visible {
+  border-color: rgba(215, 255, 0, 0.28);
+  background-color: rgba(248, 248, 243, 0.1);
+  box-shadow:
+    0 0 0 4px rgba(215, 255, 0, 0.08),
+    var(--cta-field-shadow);
+}
+
+.cta-panel[data-mode="partner"] .field--select option {
+  background: #151515;
+  color: rgba(248, 248, 243, 0.94);
+}
+
+.cta-panel[data-mode="partner"] .field--select option[value=""] {
+  color: rgba(248, 248, 243, 0.72);
 }
 
 .cta-panel[data-mode="partner"] .field.is-invalid,
@@ -1235,6 +1282,11 @@ body.is-loading {
   .rustpilot-card:hover {
     border-color: rgba(17, 17, 17, 0.14);
     box-shadow: 0 38px 78px -40px rgba(17, 17, 17, 0.34);
+  }
+
+  .cta-panel[data-mode="partner"] .field--select:hover {
+    border-color: rgba(215, 255, 0, 0.24);
+    background-color: rgba(248, 248, 243, 0.1);
   }
 }
 
