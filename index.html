@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="grubclub landing page placeholder.">
+  <title>grubclub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body class="site-body">
+  <div class="site-loader" aria-hidden="true">
+    <div class="site-loader__inner">
+      <div class="site-loader__accent"></div>
+      <div class="site-loader__wordmark-wrap">
+        <p class="site-loader__wordmark">grubclub</p>
+      </div>
+      <div class="site-loader__lines">
+        <span class="site-loader__line"></span>
+        <span class="site-loader__line"></span>
+        <span class="site-loader__line"></span>
+      </div>
+    </div>
+  </div>
+  <div class="site-noise" aria-hidden="true"></div>
+
+  <main class="page-shell">
+    <section class="hero" id="top">
+      <div class="hero__bg" aria-hidden="true">
+        <div class="hero__plane hero__plane--base"></div>
+        <div class="hero__plane hero__plane--diagonal"></div>
+        <div class="hero__blob hero__blob--green"></div>
+        <div class="hero__blob hero__blob--lime"></div>
+        <div class="hero__grid"></div>
+        <div class="hero__bar hero__bar--one"></div>
+        <div class="hero__bar hero__bar--two"></div>
+      </div>
+
+      <div class="hero__inner section-inner">
+        <div class="hero__copy">
+          <p class="hero__kicker eyebrow">founding access / 2026</p>
+          <h1 class="hero__wordmark">grubclub</h1>
+          <p class="hero__tagline">One pass for better Rust.</p>
+          <p class="hero__support">Premium membership for players, server owners, and partners.</p>
+          <a class="hero__cta button-pill button-pill--ghost" href="#waitlist">join waitlist</a>
+        </div>
+
+        <div class="hero__aside">
+          <div class="hero__stamp">
+            <svg class="hero__stamp-svg" viewBox="0 0 120 120" role="img" aria-label="coming 2026 founding access stamp">
+              <defs>
+                <path id="hero-stamp-circle" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"></path>
+              </defs>
+              <circle class="hero__stamp-ring" cx="60" cy="60" r="44"></circle>
+              <text class="hero__stamp-text">
+                <textPath href="#hero-stamp-circle" startOffset="0%">
+                  COMING 2026 &#8226; FOUNDING ACCESS &#8226; COMING 2026 &#8226;
+                </textPath>
+              </text>
+              <circle class="hero__stamp-core" cx="60" cy="60" r="16"></circle>
+              <path class="hero__stamp-cross" d="M60 42 L60 78 M42 60 L78 60"></path>
+            </svg>
+          </div>
+
+          <aside class="rustpilot-card" aria-label="RustPilot social proof card">
+            <p class="rustpilot-card__headline">F*****G GOOD</p>
+
+            <div class="rustpilot-card__stars" aria-hidden="true">
+              <span class="rustpilot-card__star-box">&#9733;</span>
+              <span class="rustpilot-card__star-box">&#9733;</span>
+              <span class="rustpilot-card__star-box">&#9733;</span>
+              <span class="rustpilot-card__star-box">&#9733;</span>
+              <span class="rustpilot-card__star-box">&#9733;</span>
+            </div>
+
+            <p class="rustpilot-card__subline">
+              Based on
+              <span class="ticker-flip" aria-live="off">
+                <span class="ticker-flip__viewport">
+                  <span class="ticker-flip__current">1</span>
+                  <span class="ticker-flip__next">2</span>
+                </span>
+              </span>
+              completely serious opinions
+            </p>
+
+            <div class="rustpilot-card__brand">
+              <span class="rustpilot-card__brand-icon">&#9733;</span>
+              <span class="rustpilot-card__brand-text">RustPilot</span>
+            </div>
+          </aside>
+
+          <div class="quote-pill quote-pill--hero">
+            <span class="quote-pill__mark">"</span>
+            <span class="quote-pill__text">queue goblin no more &#128558;&#8205;&#128168;</span>
+            <span class="quote-pill__mark">"</span>
+            <span class="quote-pill__confetti-anchor" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="audience-showcase" id="showcase">
+      <div class="audience-showcase__track">
+        <div class="audience-showcase__sticky">
+          <div class="audience-showcase__topline">
+            <div class="audience-showcase__headline" role="heading" aria-level="2">
+              <span class="audience-showcase__for">FOR</span>
+
+              <div class="audience-showcase__word-stack" aria-hidden="true">
+                <span class="audience-showcase__word is-active">PLAYERS</span>
+                <span class="audience-showcase__word">OWNERS</span>
+                <span class="audience-showcase__word">PARTNERS</span>
+              </div>
+            </div>
+
+            <div class="audience-showcase__progress" aria-hidden="true">
+              <div class="audience-showcase__progress-line"></div>
+              <div class="audience-showcase__progress-indicator"></div>
+              <div class="audience-showcase__progress-labels">
+                <span>01</span>
+                <span>02</span>
+                <span>03</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="audience-showcase__viewport">
+            <article class="audience-scene audience-scene--players is-visible" data-scene="players">
+              <div class="audience-scene__backdrop audience-scene__backdrop--players"></div>
+
+              <div class="audience-scene__layout">
+                <div class="audience-card audience-card--main">
+                  <p class="eyebrow">for players</p>
+                  <h3>Skip more queue.</h3>
+                  <p>One membership. Network perks. Cleaner access.</p>
+                </div>
+
+                <div class="audience-card audience-card--side">
+                  <p class="eyebrow">what travels</p>
+                  <h4>Perks that travel.</h4>
+                  <p>Queue priority, service deals, and founding-member upside.</p>
+                </div>
+
+                <div class="audience-strip">
+                  <span>queue priority</span>
+                  <span>service discounts</span>
+                  <span>founding access</span>
+                </div>
+
+                <div class="audience-scene__quotes">
+                  <div class="quote-pill">
+                    <span class="quote-pill__mark">"</span>
+                    <span class="quote-pill__text">my wipe prep got suspiciously efficient &#128128;</span>
+                    <span class="quote-pill__mark">"</span>
+                    <span class="quote-pill__confetti-anchor" aria-hidden="true"></span>
+                  </div>
+
+                  <div class="quote-pill">
+                    <span class="quote-pill__mark">"</span>
+                    <span class="quote-pill__text">it actually made me better at the game &#129760;</span>
+                    <span class="quote-pill__mark">"</span>
+                    <span class="quote-pill__confetti-anchor" aria-hidden="true"></span>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="audience-scene audience-scene--owners" data-scene="owners">
+              <div class="audience-scene__backdrop audience-scene__backdrop--owners"></div>
+
+              <div class="audience-scene__layout">
+                <div class="audience-card audience-card--main">
+                  <p class="eyebrow">for server owners</p>
+                  <h3>Monetise the wider base.</h3>
+                  <p>Add shared membership revenue without replacing native VIP.</p>
+                </div>
+
+                <div class="audience-card audience-card--side">
+                  <p class="eyebrow">why it works</p>
+                  <h4>Light integration.</h4>
+                  <p>Simple plugin, partner payouts, native premium still protected.</p>
+                </div>
+
+                <div class="audience-strip">
+                  <span>revenue share</span>
+                  <span>native vip safe</span>
+                  <span>founding partner</span>
+                </div>
+
+                <div class="audience-scene__quotes">
+                  <div class="quote-pill">
+                    <span class="quote-pill__mark">"</span>
+                    <span class="quote-pill__text">finally monetising the lurkers &#128762;</span>
+                    <span class="quote-pill__mark">"</span>
+                    <span class="quote-pill__confetti-anchor" aria-hidden="true"></span>
+                  </div>
+
+                  <div class="quote-pill">
+                    <span class="quote-pill__mark">"</span>
+                    <span class="quote-pill__text">native VIP still intact, bless &#128557;</span>
+                    <span class="quote-pill__mark">"</span>
+                    <span class="quote-pill__confetti-anchor" aria-hidden="true"></span>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="audience-scene audience-scene--partners" data-scene="partners">
+              <div class="audience-scene__backdrop audience-scene__backdrop--partners"></div>
+
+              <div class="audience-scene__layout">
+                <div class="audience-card audience-card--main">
+                  <p class="eyebrow">for partners</p>
+                  <h3>Distribution with upside.</h3>
+                  <p>Offer perks to a gaming-native audience already primed to buy.</p>
+                </div>
+
+                <div class="audience-card audience-card--side">
+                  <p class="eyebrow">deal shape</p>
+                  <h4>Low risk.</h4>
+                  <p>Featured placement, controlled offer design, performance-first upside.</p>
+                </div>
+
+                <div class="audience-strip">
+                  <span>featured exposure</span>
+                  <span>offer control</span>
+                  <span>performance-led</span>
+                </div>
+
+                <div class="audience-scene__quotes">
+                  <div class="quote-pill">
+                    <span class="quote-pill__mark">"</span>
+                    <span class="quote-pill__text">free distribution is disturbingly nice &#129309;</span>
+                    <span class="quote-pill__mark">"</span>
+                    <span class="quote-pill__confetti-anchor" aria-hidden="true"></span>
+                  </div>
+
+                  <div class="quote-pill">
+                    <span class="quote-pill__mark">"</span>
+                    <span class="quote-pill__text">this audience literally is our audience &#127919;</span>
+                    <span class="quote-pill__mark">"</span>
+                    <span class="quote-pill__confetti-anchor" aria-hidden="true"></span>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="final-cta" id="waitlist">
+      <div class="final-cta__bg" aria-hidden="true">
+        <div class="final-cta__orb final-cta__orb--one"></div>
+        <div class="final-cta__orb final-cta__orb--two"></div>
+        <div class="final-cta__mesh"></div>
+      </div>
+
+      <div class="final-cta__inner section-inner">
+        <div class="final-cta__intro">
+          <p class="eyebrow">founding access</p>
+          <h2>Get in early.</h2>
+          <p>Choose the lane that fits.</p>
+        </div>
+
+        <div class="cta-panel" data-mode="waitlist">
+          <div class="cta-panel__theme-sweep" aria-hidden="true"></div>
+
+          <div class="cta-panel__toggle" role="tablist" aria-label="conversion mode">
+            <button class="cta-panel__tab is-active" type="button" role="tab" data-mode-target="waitlist" aria-pressed="true" aria-selected="true" aria-controls="cta-form-waitlist">join waitlist</button>
+            <button class="cta-panel__tab" type="button" role="tab" data-mode-target="partner" aria-pressed="false" aria-selected="false" aria-controls="cta-form-partner">partner application</button>
+          </div>
+
+          <div class="cta-panel__forms">
+            <form class="cta-form cta-form--waitlist is-visible" id="cta-form-waitlist" novalidate>
+              <div class="field-group field-group--single">
+                <label class="sr-only" for="waitlist-email">Email</label>
+                <input class="field" id="waitlist-email" name="email" type="email" placeholder="email address" required />
+                <button class="button-pill button-pill--solid" type="submit">join waitlist</button>
+              </div>
+              <p class="cta-form__micro">No spam. No weirdness. Just launch updates.</p>
+            </form>
+
+            <form class="cta-form cta-form--partner" id="cta-form-partner" novalidate>
+              <div class="field-group">
+                <label class="sr-only" for="partner-email">Email</label>
+                <input class="field" id="partner-email" name="email" type="email" placeholder="email address" required />
+              </div>
+
+              <div class="field-group">
+                <label class="sr-only" for="partner-name">Company or server name</label>
+                <input class="field" id="partner-name" name="name" type="text" placeholder="company or server name" required />
+              </div>
+
+              <div class="field-group">
+                <label class="sr-only" for="partner-type">Partner type</label>
+                <select class="field field--select" id="partner-type" name="type" required>
+                  <option value="">partner type</option>
+                  <option value="server-owner">server owner</option>
+                  <option value="service-partner">service partner</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label class="sr-only" for="partner-link">Website or Discord</label>
+                <input class="field" id="partner-link" name="link" type="text" placeholder="website or discord" />
+              </div>
+
+              <div class="field-group">
+                <label class="sr-only" for="partner-message">Short note</label>
+                <textarea class="field field--textarea" id="partner-message" name="message" rows="4" placeholder="short note"></textarea>
+              </div>
+
+              <div class="field-group field-group--actions">
+                <button class="button-pill button-pill--solid" type="submit">send application</button>
+              </div>
+
+              <p class="cta-form__micro">Founding partner conversations only. Keep it short.</p>
+            </form>
+          </div>
+
+          <div class="cta-panel__status" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+    <footer class="site-footer">
+      <div class="site-footer__inner section-inner">
+        <div class="site-footer__brand">grubclub</div>
+        <div class="site-footer__meta">
+          <span>launching 2026</span>
+          <span>founding access open</span>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+  <script src="scripts/main.js"></script>
+</body>
+</html>
