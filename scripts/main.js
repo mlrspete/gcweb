@@ -292,11 +292,17 @@
     var track = section.querySelector(".audience-showcase__track");
     var sticky = section.querySelector(".audience-showcase__sticky");
     var wordStack = section.querySelector(".audience-showcase__word-stack");
-    var words = section.querySelectorAll(".audience-showcase__word");
-    var scenes = section.querySelectorAll(".audience-scene");
+    var wordTrack = section.querySelector(".audience-showcase__word-track");
+    var words = Array.prototype.slice.call(section.querySelectorAll(".audience-showcase__word"));
+    var scenes = Array.prototype.slice.call(section.querySelectorAll(".audience-scene"));
+    var progress = section.querySelector(".audience-showcase__progress");
     var progressLine = section.querySelector(".audience-showcase__progress-line");
     var progressIndicator = section.querySelector(".audience-showcase__progress-indicator");
+    var progressLabels = Array.prototype.slice.call(section.querySelectorAll(".audience-showcase__progress-labels span"));
     var sceneBackgrounds = ["#eaf3bd", "#d9d9d1", "#dff0de"];
+    var wordOffsets = [0, 0, 0];
+    var progressStops = [0, 0, 0];
+    var activeSceneIndex = 0;
 
     function setActiveScene(index) {
       words.forEach(function (word, wordIndex) {
@@ -304,27 +310,104 @@
       });
     }
 
-    function getIndicatorStops() {
-      if (!progressLine || !progressIndicator) {
+    function getSceneIndex(progressValue) {
+      if (progressValue >= (2 / 3)) {
+        return 2;
+      }
+
+      if (progressValue >= (1 / 3)) {
+        return 1;
+      }
+
+      return 0;
+    }
+
+    function measureWordOffsets() {
+      var rowHeight = 0;
+
+      if (!wordStack || !wordTrack || !words.length) {
         return [0, 0, 0];
       }
 
-      var range = Math.max(progressLine.offsetHeight - progressIndicator.offsetHeight, 0);
+      words.forEach(function (word) {
+        rowHeight = Math.max(rowHeight, Math.ceil(word.getBoundingClientRect().height));
+      });
 
-      return [0, range / 2, range];
+      rowHeight = rowHeight || Math.ceil(wordStack.getBoundingClientRect().height) || 0;
+      wordStack.style.setProperty("--audience-word-row-height", rowHeight + "px");
+
+      return words.map(function (_, index) {
+        return rowHeight * index * -1;
+      });
     }
+
+    function measureProgressStops() {
+      var indicatorHeight;
+      var progressRect;
+      var labelCenters;
+
+      if (!progress || !progressLine || !progressIndicator || !progressLabels.length || progress.offsetParent === null) {
+        if (progress) {
+          progress.style.setProperty("--audience-progress-line-start", "0px");
+          progress.style.setProperty("--audience-progress-line-end", "100%");
+        }
+
+        return [0, 0, 0];
+      }
+
+      indicatorHeight = progressIndicator.offsetHeight || 10;
+      progressRect = progress.getBoundingClientRect();
+      labelCenters = progressLabels.map(function (label) {
+        var rect = label.getBoundingClientRect();
+
+        return (rect.top - progressRect.top) + (rect.height / 2);
+      });
+
+      progress.style.setProperty("--audience-progress-line-start", labelCenters[0] + "px");
+      progress.style.setProperty("--audience-progress-line-end", labelCenters[labelCenters.length - 1] + "px");
+
+      return labelCenters.map(function (center) {
+        return center - (indicatorHeight / 2);
+      });
+    }
+
+    function applyCurrentSceneState(index) {
+      var safeIndex = Math.max(0, Math.min(index, scenes.length - 1));
+
+      activeSceneIndex = safeIndex;
+      setActiveScene(safeIndex);
+
+      if (wordTrack) {
+        if (hasGsap) {
+          window.gsap.set(wordTrack, { y: wordOffsets[safeIndex] || 0 });
+        } else {
+          wordTrack.style.transform = "translate3d(0, " + (wordOffsets[safeIndex] || 0) + "px, 0)";
+        }
+      }
+
+      if (progressIndicator) {
+        if (hasGsap) {
+          window.gsap.set(progressIndicator, { y: progressStops[safeIndex] || 0 });
+        } else {
+          progressIndicator.style.transform = "translateX(-50%) translateY(" + (progressStops[safeIndex] || 0) + "px)";
+        }
+      }
+    }
+
+    function measureAudienceLayout() {
+      wordOffsets = measureWordOffsets();
+      progressStops = measureProgressStops();
+    }
+
+    measureAudienceLayout();
+    applyCurrentSceneState(0);
 
     if (state.reducedMotion || !hasGsap || !window.ScrollTrigger) {
       section.classList.add("audience-showcase--static");
-      setActiveScene(0);
       return;
     }
 
-    setActiveScene(0);
-
-    window.gsap.set(wordStack, { yPercent: 0 });
     window.gsap.set(sticky, { backgroundColor: sceneBackgrounds[0] });
-    window.gsap.set(progressIndicator, { y: 0 });
 
     scenes.forEach(function (scene, index) {
       window.gsap.set(scene, {
@@ -333,6 +416,8 @@
         scale: index === 0 ? 1 : 0.985
       });
     });
+
+    window.ScrollTrigger.addEventListener("refreshInit", measureAudienceLayout);
 
     window.gsap.timeline({
       defaults: {
@@ -349,26 +434,21 @@
         invalidateOnRefresh: true,
         anticipatePin: 1,
         onUpdate: function (self) {
-          var index = 0;
-
-          if (self.progress >= (2 / 3)) {
-            index = 2;
-          } else if (self.progress >= (1 / 3)) {
-            index = 1;
-          }
-
-          setActiveScene(index);
+          activeSceneIndex = getSceneIndex(self.progress);
+          setActiveScene(activeSceneIndex);
         }
       }
     })
       .to({}, { duration: 1 })
-      .to(wordStack, {
-        yPercent: -33.333,
+      .to(wordTrack, {
+        y: function () {
+          return wordOffsets[1];
+        },
         duration: 1
       }, 1)
       .to(progressIndicator, {
         y: function () {
-          return getIndicatorStops()[1];
+          return progressStops[1];
         },
         duration: 1
       }, 1)
@@ -390,13 +470,15 @@
         duration: 1,
         ease: "power2.out"
       }, 1)
-      .to(wordStack, {
-        yPercent: -66.666,
+      .to(wordTrack, {
+        y: function () {
+          return wordOffsets[2];
+        },
         duration: 1
       }, 2)
       .to(progressIndicator, {
         y: function () {
-          return getIndicatorStops()[2];
+          return progressStops[2];
         },
         duration: 1
       }, 2)
@@ -418,6 +500,12 @@
         duration: 1,
         ease: "power2.out"
       }, 2);
+
+    window.addEventListener("resize", function () {
+      measureAudienceLayout();
+      applyCurrentSceneState(activeSceneIndex);
+      window.ScrollTrigger.refresh();
+    });
   }
 
   function initFinalCta() {

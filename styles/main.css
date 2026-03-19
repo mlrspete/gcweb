@@ -443,17 +443,23 @@ body.is-loading {
 
 .audience-showcase__word-stack {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  height: 1em;
+  display: block;
+  height: var(--audience-word-row-height, 1em);
   overflow: hidden;
   color: var(--color-black);
+}
+
+.audience-showcase__word-track {
+  display: flex;
+  flex-direction: column;
   will-change: transform;
 }
 
 .audience-showcase__word {
   display: block;
-  height: 1em;
+  flex: 0 0 var(--audience-word-row-height, 1em);
+  height: var(--audience-word-row-height, 1em);
+  white-space: nowrap;
 }
 
 .audience-showcase__word.is-active {
@@ -461,6 +467,8 @@ body.is-loading {
 }
 
 .audience-showcase__progress {
+  --audience-progress-line-start: 0px;
+  --audience-progress-line-end: 100%;
   position: relative;
   width: 84px;
   height: clamp(140px, 18vh, 200px);
@@ -469,17 +477,17 @@ body.is-loading {
 
 .audience-showcase__progress-line {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 28px;
+  top: var(--audience-progress-line-start);
+  left: 18px;
   width: 1px;
+  height: calc(var(--audience-progress-line-end) - var(--audience-progress-line-start));
   background: rgba(17, 17, 17, 0.18);
 }
 
 .audience-showcase__progress-indicator {
   position: absolute;
   top: 0;
-  left: 28px;
+  left: 18px;
   width: 10px;
   height: 10px;
   border-radius: 50%;
@@ -494,10 +502,16 @@ body.is-loading {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding-left: 1.05rem;
+  padding-left: 2rem;
   font-family: var(--font-mono);
   font-size: var(--text-micro);
   letter-spacing: 0.12em;
+}
+
+.audience-showcase__progress-labels span {
+  display: flex;
+  align-items: center;
+  min-height: 1.1rem;
 }
 
 .audience-showcase__viewport {
@@ -749,12 +763,12 @@ body.is-loading {
 
 .audience-scene--players .audience-scene__quotes .quote-pill:nth-child(1) {
   top: 18%;
-  right: 12%;
+  right: 4%;
 }
 
 .audience-scene--players .audience-scene__quotes .quote-pill:nth-child(2) {
-  right: 6%;
-  bottom: 13%;
+  right: 15%;
+  bottom: 12%;
 }
 
 .audience-scene--owners .audience-card--main {
@@ -801,8 +815,8 @@ body.is-loading {
 }
 
 .audience-scene--owners .audience-scene__quotes .quote-pill:nth-child(2) {
-  left: 7%;
-  bottom: 14%;
+  left: 10%;
+  bottom: 6%;
 }
 
 .audience-scene--partners .audience-card--main {
@@ -822,13 +836,13 @@ body.is-loading {
 }
 
 .audience-scene--partners .audience-scene__quotes .quote-pill:nth-child(1) {
-  top: 16%;
-  right: 9%;
+  top: 14%;
+  right: 6%;
 }
 
 .audience-scene--partners .audience-scene__quotes .quote-pill:nth-child(2) {
-  left: 9%;
-  bottom: 14%;
+  left: 46%;
+  bottom: 17%;
 }
 
 .audience-showcase--static {
@@ -1765,13 +1779,17 @@ body.is-loading {
   }
 
   .audience-showcase__progress {
-    width: 72px;
+    width: 76px;
     height: 160px;
   }
 
   .audience-showcase__progress-line,
   .audience-showcase__progress-indicator {
-    left: 22px;
+    left: 14px;
+  }
+
+  .audience-showcase__progress-labels {
+    padding-left: 1.75rem;
   }
 
   .audience-scene__layout {
@@ -1803,6 +1821,21 @@ body.is-loading {
   .audience-scene--owners .audience-scene__quotes .quote-pill:nth-child(1),
   .audience-scene--partners .audience-scene__quotes .quote-pill:nth-child(1) {
     right: 5%;
+  }
+
+  .audience-scene--players .audience-scene__quotes .quote-pill:nth-child(2) {
+    right: 11%;
+    bottom: 10%;
+  }
+
+  .audience-scene--owners .audience-scene__quotes .quote-pill:nth-child(2) {
+    left: 8%;
+    bottom: 5%;
+  }
+
+  .audience-scene--partners .audience-scene__quotes .quote-pill:nth-child(2) {
+    left: 42%;
+    bottom: 15%;
   }
 
   .cta-panel {
