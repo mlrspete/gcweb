@@ -90,8 +90,29 @@
     });
   }
 
-  function syncTickerWidth(viewport, current, next) {
-    viewport.style.width = Math.max(current.offsetWidth, next.offsetWidth, 10) + "px";
+  function formatTickerValue(number) {
+    return number.toLocaleString("en-US");
+  }
+
+  function isTickerDigit(character) {
+    return /\d/.test(character);
+  }
+
+  function getTickerTemplate(number) {
+    return formatTickerValue(Math.max(number, 1000)).split("");
+  }
+
+  function alignTickerChars(number, length) {
+    var characters = formatTickerValue(number).split("");
+    var aligned = new Array(length);
+    var offset = length - characters.length;
+    var index;
+
+    for (index = 0; index < length; index += 1) {
+      aligned[index] = index < offset ? "" : characters[index - offset];
+    }
+
+    return aligned;
   }
 
   function initTicker(ticker) {
@@ -99,84 +120,167 @@
       return;
     }
 
-    var viewport = ticker.querySelector(".ticker-flip__viewport");
-    var current = ticker.querySelector(".ticker-flip__current");
-    var next = ticker.querySelector(".ticker-flip__next");
-    var value = 1;
-    var renderToken = 0;
-    var tickInterval = state.reducedMotion ? 240 : 120;
+    var animationDuration = 180;
+    var value = 569;
+    var slots = [];
+    var template = [];
+    var templateKey = "";
 
-    function formatValue(number) {
-      return number.toLocaleString("en-US");
+    function clearDigitSlot(slot) {
+      while (slot.strip.firstChild) {
+        slot.strip.removeChild(slot.strip.firstChild);
+      }
     }
 
-    function settle(valueToRender, token) {
-      window.setTimeout(function () {
-        if (token !== renderToken) {
-          return;
+    function createDigitCell(character) {
+      var cell = document.createElement("span");
+      var isEmpty = character === "";
+
+      cell.className = "ticker-flip__digit-cell" + (isEmpty ? " is-empty" : "");
+      cell.textContent = isEmpty ? "0" : character;
+      return cell;
+    }
+
+    function clearSlotTimer(slot) {
+      if (slot.timer) {
+        window.clearTimeout(slot.timer);
+        slot.timer = null;
+      }
+    }
+
+    function setDigitSlot(slot, character) {
+      clearSlotTimer(slot);
+      slot.strip.classList.remove("is-animating");
+      clearDigitSlot(slot);
+      slot.strip.appendChild(createDigitCell(character));
+      slot.character = character;
+    }
+
+    function animateDigitSlot(slot, fromCharacter, toCharacter) {
+      clearSlotTimer(slot);
+      slot.strip.classList.remove("is-animating");
+      clearDigitSlot(slot);
+      slot.strip.appendChild(createDigitCell(fromCharacter));
+      slot.strip.appendChild(createDigitCell(toCharacter));
+      void slot.strip.offsetHeight;
+      slot.strip.classList.add("is-animating");
+      slot.character = toCharacter;
+      slot.timer = window.setTimeout(function () {
+        setDigitSlot(slot, toCharacter);
+      }, animationDuration + 32);
+    }
+
+    function setSeparatorSlot(slot, character) {
+      slot.character = character;
+      slot.el.classList.toggle("is-hidden", character !== ",");
+    }
+
+    function buildSlots(nextTemplate, seedValue) {
+      var seedChars = alignTickerChars(seedValue, nextTemplate.length);
+      var index;
+      var slot;
+      var digitWindow;
+      var digitStrip;
+
+      for (index = 0; index < slots.length; index += 1) {
+        clearSlotTimer(slots[index]);
+      }
+
+      slots = [];
+      template = nextTemplate.slice();
+      templateKey = template.join("");
+      ticker.textContent = "";
+
+      for (index = 0; index < template.length; index += 1) {
+        if (isTickerDigit(template[index])) {
+          slot = {
+            type: "digit",
+            timer: null
+          };
+          slot.el = document.createElement("span");
+          slot.el.className = "ticker-flip__slot ticker-flip__slot--digit";
+          digitWindow = document.createElement("span");
+          digitWindow.className = "ticker-flip__digit-window";
+          digitStrip = document.createElement("span");
+          digitStrip.className = "ticker-flip__digit-strip";
+          digitWindow.appendChild(digitStrip);
+          slot.el.appendChild(digitWindow);
+          slot.strip = digitStrip;
+          ticker.appendChild(slot.el);
+          slots.push(slot);
+          setDigitSlot(slot, seedChars[index]);
+          continue;
         }
 
-        current.textContent = formatValue(valueToRender);
-        next.textContent = formatValue(valueToRender + 1);
-        syncTickerWidth(viewport, current, next);
+        slot = {
+          type: "separator",
+          timer: null
+        };
+        slot.el = document.createElement("span");
+        slot.el.className = "ticker-flip__slot ticker-flip__slot--separator";
+        slot.el.textContent = template[index];
+        ticker.appendChild(slot.el);
+        slots.push(slot);
+        setSeparatorSlot(slot, seedChars[index]);
+      }
 
-        if (hasGsap) {
-          window.gsap.set(current, { yPercent: 0, opacity: 1 });
-          window.gsap.set(next, { yPercent: 100, opacity: 1 });
-        }
-      }, 205);
+      ticker.setAttribute("aria-label", formatTickerValue(seedValue));
+    }
+
+    function syncTemplate(nextValue) {
+      var nextTemplate = getTickerTemplate(nextValue);
+      var nextTemplateKey = nextTemplate.join("");
+
+      if (templateKey !== nextTemplateKey) {
+        buildSlots(nextTemplate, value);
+      }
     }
 
     function renderTick(nextValue) {
-      renderToken += 1;
+      var currentChars;
+      var nextChars;
+      var index;
+      var slot;
 
-      current.textContent = formatValue(nextValue - 1);
-      next.textContent = formatValue(nextValue);
-      syncTickerWidth(viewport, current, next);
+      syncTemplate(nextValue);
+      currentChars = alignTickerChars(value, template.length);
+      nextChars = alignTickerChars(nextValue, template.length);
 
-      if (state.reducedMotion || !hasGsap) {
-        current.textContent = formatValue(nextValue);
-        next.textContent = formatValue(nextValue + 1);
-        syncTickerWidth(viewport, current, next);
-        return;
+      for (index = 0; index < slots.length; index += 1) {
+        slot = slots[index];
+
+        if (slot.type === "separator") {
+          if (slot.character !== nextChars[index]) {
+            setSeparatorSlot(slot, nextChars[index]);
+          }
+          continue;
+        }
+
+        if (currentChars[index] === nextChars[index]) {
+          continue;
+        }
+
+        if (state.reducedMotion) {
+          setDigitSlot(slot, nextChars[index]);
+          continue;
+        }
+
+        animateDigitSlot(slot, currentChars[index], nextChars[index]);
       }
 
-      window.gsap.killTweensOf([current, next]);
-      window.gsap.set(current, { yPercent: 0, opacity: 1 });
-      window.gsap.set(next, { yPercent: 100, opacity: 1 });
-
-      window.gsap.to(current, {
-        yPercent: -100,
-        opacity: 0.55,
-        duration: 0.2,
-        ease: "power2.out",
-        overwrite: "auto"
-      });
-
-      window.gsap.to(next, {
-        yPercent: 0,
-        opacity: 1,
-        duration: 0.2,
-        ease: "power2.out",
-        overwrite: "auto"
-      });
-
-      settle(nextValue, renderToken);
+      value = nextValue;
+      ticker.setAttribute("aria-label", formatTickerValue(value));
     }
 
-    current.textContent = formatValue(value);
-    next.textContent = formatValue(value + 1);
-    syncTickerWidth(viewport, current, next);
-
-    if (hasGsap) {
-      window.gsap.set(current, { yPercent: 0, opacity: 1 });
-      window.gsap.set(next, { yPercent: 100, opacity: 1 });
+    function scheduleNextTick() {
+      window.setTimeout(function () {
+        renderTick(value + 1);
+        scheduleNextTick();
+      }, state.reducedMotion ? 420 : 260);
     }
 
-    window.setInterval(function () {
-      value += 1;
-      renderTick(value);
-    }, tickInterval);
+    buildSlots(getTickerTemplate(value), value);
+    scheduleNextTick();
   }
 
   function initHero(loaderReady) {
@@ -303,6 +407,18 @@
     var wordOffsets = [0, 0, 0];
     var progressStops = [0, 0, 0];
     var activeSceneIndex = 0;
+    var phaseDurations = {
+      playersHold: 1,
+      playersToOwners: 1,
+      ownersHold: 1.15,
+      ownersToPartners: 1
+    };
+    var phasePoints = {
+      playersHoldEnd: phaseDurations.playersHold,
+      playersToOwnersEnd: phaseDurations.playersHold + phaseDurations.playersToOwners,
+      ownersHoldEnd: phaseDurations.playersHold + phaseDurations.playersToOwners + phaseDurations.ownersHold,
+      total: phaseDurations.playersHold + phaseDurations.playersToOwners + phaseDurations.ownersHold + phaseDurations.ownersToPartners
+    };
 
     function setActiveScene(index) {
       words.forEach(function (word, wordIndex) {
@@ -311,11 +427,13 @@
     }
 
     function getSceneIndex(progressValue) {
-      if (progressValue >= (2 / 3)) {
+      var timelinePosition = progressValue * phasePoints.total;
+
+      if (timelinePosition >= (phasePoints.ownersHoldEnd + (phaseDurations.ownersToPartners / 2))) {
         return 2;
       }
 
-      if (progressValue >= (1 / 3)) {
+      if (timelinePosition >= (phasePoints.playersHoldEnd + (phaseDurations.playersToOwners / 2))) {
         return 1;
       }
 
@@ -429,7 +547,7 @@
         scrub: true,
         start: "top top",
         end: function () {
-          return "+=" + Math.max(track.offsetHeight - window.innerHeight, window.innerHeight * 2.2);
+          return "+=" + (Math.max(track.offsetHeight - window.innerHeight, window.innerHeight * 2.2) + window.innerHeight);
         },
         invalidateOnRefresh: true,
         anticipatePin: 1,
@@ -439,67 +557,68 @@
         }
       }
     })
-      .to({}, { duration: 1 })
+      .to({}, { duration: phaseDurations.playersHold })
       .to(wordTrack, {
         y: function () {
           return wordOffsets[1];
         },
-        duration: 1
-      }, 1)
+        duration: phaseDurations.playersToOwners
+      }, phasePoints.playersHoldEnd)
       .to(progressIndicator, {
         y: function () {
           return progressStops[1];
         },
-        duration: 1
-      }, 1)
+        duration: phaseDurations.playersToOwners
+      }, phasePoints.playersHoldEnd)
       .to(sticky, {
         backgroundColor: sceneBackgrounds[1],
-        duration: 1
-      }, 1)
+        duration: phaseDurations.playersToOwners
+      }, phasePoints.playersHoldEnd)
       .to(scenes[0], {
         autoAlpha: 0,
         y: 24,
         scale: 0.985,
-        duration: 1,
+        duration: phaseDurations.playersToOwners,
         ease: "power2.out"
-      }, 1)
+      }, phasePoints.playersHoldEnd)
       .to(scenes[1], {
         autoAlpha: 1,
         y: 0,
         scale: 1,
-        duration: 1,
+        duration: phaseDurations.playersToOwners,
         ease: "power2.out"
-      }, 1)
+      }, phasePoints.playersHoldEnd)
+      .to({}, { duration: phaseDurations.ownersHold }, phasePoints.playersToOwnersEnd)
       .to(wordTrack, {
         y: function () {
           return wordOffsets[2];
         },
-        duration: 1
-      }, 2)
+        duration: phaseDurations.ownersToPartners
+      }, phasePoints.ownersHoldEnd)
       .to(progressIndicator, {
         y: function () {
           return progressStops[2];
         },
-        duration: 1
-      }, 2)
+        duration: phaseDurations.ownersToPartners
+      }, phasePoints.ownersHoldEnd)
       .to(sticky, {
         backgroundColor: sceneBackgrounds[2],
-        duration: 1
-      }, 2)
+        duration: phaseDurations.ownersToPartners
+      }, phasePoints.ownersHoldEnd)
       .to(scenes[1], {
         autoAlpha: 0,
         y: 24,
         scale: 0.985,
-        duration: 1,
+        duration: phaseDurations.ownersToPartners,
         ease: "power2.out"
-      }, 2)
+      }, phasePoints.ownersHoldEnd)
       .to(scenes[2], {
         autoAlpha: 1,
         y: 0,
         scale: 1,
-        duration: 1,
+        duration: phaseDurations.ownersToPartners,
         ease: "power2.out"
-      }, 2);
+      }, phasePoints.ownersHoldEnd);
 
     window.addEventListener("resize", function () {
       measureAudienceLayout();
