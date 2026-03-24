@@ -1,3 +1,5 @@
+var GRUBCLUB_FORMS_ENDPOINT = "";
+
 (function () {
   var hasGsap = typeof window.gsap !== "undefined";
   var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -120,8 +122,10 @@
       return;
     }
 
-    var animationDuration = 180;
-    var value = 569;
+    var animationDuration = 145;
+    var normalTickCadence = 210;
+    var reducedTickCadence = 320;
+    var value = 1000;
     var slots = [];
     var template = [];
     var templateKey = "";
@@ -276,7 +280,7 @@
       window.setTimeout(function () {
         renderTick(value + 1);
         scheduleNextTick();
-      }, state.reducedMotion ? 420 : 260);
+      }, state.reducedMotion ? reducedTickCadence : normalTickCadence);
     }
 
     buildSlots(getTickerTemplate(value), value);
@@ -643,6 +647,7 @@
       partner: section.querySelector(".cta-form--partner")
     };
     var activeMode = panel ? panel.getAttribute("data-mode") || "waitlist" : "waitlist";
+    var isSubmitting = false;
 
     if (!panel || !forms.waitlist || !forms.partner) {
       return;
@@ -660,6 +665,10 @@
       }
 
       status.classList.add("is-visible", "is-" + type);
+    }
+
+    function getEndpointUrl() {
+      return typeof GRUBCLUB_FORMS_ENDPOINT === "string" ? GRUBCLUB_FORMS_ENDPOINT.trim() : "";
     }
 
     function clearValidation(form) {
@@ -716,6 +725,83 @@
     function setFormEnabled(form, enabled) {
       Array.prototype.forEach.call(form.elements, function (field) {
         field.disabled = !enabled;
+      });
+    }
+
+    function setTabsBusy(isBusy) {
+      tabs.forEach(function (tab) {
+        tab.setAttribute("aria-disabled", String(isBusy));
+      });
+    }
+
+    function getFieldValue(form, name) {
+      var field = form.elements[name];
+      var value = field ? field.value : "";
+
+      return typeof value === "string" ? value.trim() : value;
+    }
+
+    function buildSubmissionPayload(mode, form) {
+      var payload = {
+        formType: mode,
+        submittedAt: new Date().toISOString(),
+        pageUrl: window.location.href,
+        userAgent: window.navigator.userAgent || "",
+        email: getFieldValue(form, "email")
+      };
+
+      if (mode === "partner") {
+        payload.name = getFieldValue(form, "name");
+        payload.type = getFieldValue(form, "type");
+        payload.link = getFieldValue(form, "link");
+        payload.message = getFieldValue(form, "message");
+      }
+
+      return payload;
+    }
+
+    function setSubmitButtonLoadingState(form, isLoading, loadingLabel) {
+      var submitButton = form.querySelector("[type=\"submit\"]");
+
+      if (!submitButton) {
+        return;
+      }
+
+      if (!submitButton.hasAttribute("data-default-label")) {
+        submitButton.setAttribute("data-default-label", submitButton.textContent);
+      }
+
+      submitButton.textContent = isLoading
+        ? loadingLabel
+        : submitButton.getAttribute("data-default-label");
+    }
+
+    function finishFormSubmission(form) {
+      isSubmitting = false;
+      form.removeAttribute("aria-busy");
+      setSubmitButtonLoadingState(form, false);
+      setTabsBusy(false);
+      applyModeState(activeMode);
+    }
+
+    function submitFormPayload(endpointUrl, payload) {
+      if (typeof window.fetch !== "function") {
+        return Promise.reject(new Error("Fetch unavailable"));
+      }
+
+      return window.fetch(endpointUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "omit",
+        body: JSON.stringify(payload)
+      }).then(function (response) {
+        if (!response.ok) {
+          throw new Error("Request failed");
+        }
+
+        return response;
       });
     }
 
@@ -802,7 +888,7 @@
     }
 
     function switchMode(targetMode) {
-      if (!forms[targetMode] || targetMode === activeMode) {
+      if (isSubmitting || !forms[targetMode] || targetMode === activeMode) {
         return;
       }
 
@@ -814,12 +900,21 @@
 
     tabs.forEach(function (tab) {
       tab.addEventListener("click", function () {
+        if (isSubmitting) {
+          return;
+        }
+
         switchMode(tab.getAttribute("data-mode-target"));
       });
 
       tab.addEventListener("keydown", function (event) {
         var currentIndex = Array.prototype.indexOf.call(tabs, tab);
         var nextIndex = currentIndex;
+
+        if (isSubmitting) {
+          event.preventDefault();
+          return;
+        }
 
         if (event.key === "ArrowRight" || event.key === "ArrowDown") {
           nextIndex = (currentIndex + 1) % tabs.length;
@@ -843,29 +938,60 @@
       var form = forms[mode];
 
       form.addEventListener("submit", function (event) {
+        var endpointUrl;
+        var payload;
         var result;
         var successCopy;
-        var errorCopy;
+        var validationErrorCopy;
+        var networkErrorCopy;
 
         event.preventDefault();
         clearValidation(form);
 
         result = validateForm(form);
-        successCopy = mode === "partner" ? "Application queued." : "You\u2019re on it.";
-        errorCopy = mode === "partner" ? "Complete the required fields." : "Enter a valid email.";
+        successCopy = mode === "partner" ? "Nice. We\u2019ve got your application." : "Nice. You\u2019re on the list.";
+        validationErrorCopy = mode === "partner" ? "Complete the required fields." : "Enter a valid email.";
+        networkErrorCopy = mode === "partner"
+          ? "Couldn\u2019t send right now. Try again or DM us."
+          : "Couldn\u2019t send right now. Try again in a sec.";
 
         if (!result.isValid) {
-          setStatus("error", errorCopy);
+          setStatus("error", validationErrorCopy);
           if (result.firstInvalid) {
             result.firstInvalid.focus();
           }
           return;
         }
 
-        form.reset();
-        clearValidation(form);
-        syncFormHeights();
-        setStatus("success", successCopy);
+        endpointUrl = getEndpointUrl();
+
+        if (!endpointUrl) {
+          setStatus("error", "Forms aren\u2019t wired yet. Add the endpoint and try again.");
+          return;
+        }
+
+        payload = buildSubmissionPayload(mode, form);
+        isSubmitting = true;
+        setTabsBusy(true);
+        setStatus("", "");
+        form.setAttribute("aria-busy", "true");
+        setSubmitButtonLoadingState(form, true, "sending\u2026");
+        setFormEnabled(form, false);
+
+        submitFormPayload(endpointUrl, payload)
+          .then(function () {
+            form.reset();
+            clearValidation(form);
+            syncFormHeights();
+            setStatus("success", successCopy);
+          }, function () {
+            setStatus("error", networkErrorCopy);
+          })
+          .then(function () {
+            finishFormSubmission(form);
+          }, function () {
+            finishFormSubmission(form);
+          });
       });
     });
 
