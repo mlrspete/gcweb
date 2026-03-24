@@ -408,9 +408,19 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
     var progressIndicator = section.querySelector(".audience-showcase__progress-indicator");
     var progressLabels = Array.prototype.slice.call(section.querySelectorAll(".audience-showcase__progress-labels span"));
     var sceneBackgrounds = ["#eaf3bd", "#d9d9d1", "#dff0de"];
+    var sceneChildGroups = scenes.map(function (scene) {
+      return {
+        mainCard: scene.querySelector(".audience-card--main"),
+        sideCard: scene.querySelector(".audience-card--side"),
+        stripChips: Array.prototype.slice.call(scene.querySelectorAll(".audience-strip span")),
+        quotePills: Array.prototype.slice.call(scene.querySelectorAll(".audience-scene__quotes .quote-pill"))
+      };
+    });
     var wordOffsets = [0, 0, 0];
     var progressStops = [0, 0, 0];
     var activeSceneIndex = 0;
+    var playersIntroPlayed = false;
+    var playersIntroTimeline = null;
     var phaseDurations = {
       playersHold: 1,
       playersToOwners: 1,
@@ -423,6 +433,272 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
       ownersHoldEnd: phaseDurations.playersHold + phaseDurations.playersToOwners + phaseDurations.ownersHold,
       total: phaseDurations.playersHold + phaseDurations.playersToOwners + phaseDurations.ownersHold + phaseDurations.ownersToPartners
     };
+    var childIntroOffsets = {
+      sideCard: 0.08,
+      chips: 0.16,
+      quotes: 0.28
+    };
+    var childIntroDurations = {
+      mainCard: 0.72,
+      sideCard: 0.74,
+      chips: 0.42,
+      quotes: 0.5
+    };
+    var childTransitionDurations = {
+      mainCard: 0.58,
+      sideCard: 0.6,
+      chips: 0.34,
+      quotes: 0.4
+    };
+    var childTransitionOffsets = {
+      incoming: 0.14,
+      outgoing: 0.3,
+      outgoingChips: 0.33,
+      outgoingQuotes: 0.36
+    };
+
+    function getSceneChildTargets(sceneChildGroup) {
+      return [sceneChildGroup.mainCard, sceneChildGroup.sideCard]
+        .concat(sceneChildGroup.stripChips, sceneChildGroup.quotePills)
+        .filter(function (target) {
+          return !!target;
+        });
+    }
+
+    function setSceneChildrenAtRest(sceneChildGroup) {
+      var targets = getSceneChildTargets(sceneChildGroup);
+
+      if (!targets.length) {
+        return;
+      }
+
+      window.gsap.set(targets, {
+        x: 0,
+        y: 0,
+        scale: 1,
+        rotate: 0,
+        autoAlpha: 1
+      });
+    }
+
+    function addSceneChildIntro(timeline, sceneChildGroup, startTime, durations, setupTime) {
+      var introSetupTime = typeof setupTime === "number" ? setupTime : startTime;
+
+      if (sceneChildGroup.mainCard) {
+        timeline
+          .set(sceneChildGroup.mainCard, {
+            y: 34,
+            scale: 0.985,
+            rotate: -0.8,
+            autoAlpha: 0
+          }, introSetupTime)
+          .to(sceneChildGroup.mainCard, {
+            y: 0,
+            scale: 1,
+            rotate: 0,
+            autoAlpha: 1,
+            duration: durations.mainCard,
+            ease: "power3.out",
+            overwrite: "auto"
+          }, startTime);
+      }
+
+      if (sceneChildGroup.sideCard) {
+        timeline
+          .set(sceneChildGroup.sideCard, {
+            x: 18,
+            y: 38,
+            scale: 0.985,
+            rotate: 0.8,
+            autoAlpha: 0
+          }, introSetupTime)
+          .to(sceneChildGroup.sideCard, {
+            x: 0,
+            y: 0,
+            scale: 1,
+            rotate: 0,
+            autoAlpha: 1,
+            duration: durations.sideCard,
+            ease: "power3.out",
+            overwrite: "auto"
+          }, startTime + childIntroOffsets.sideCard);
+      }
+
+      if (sceneChildGroup.stripChips.length) {
+        timeline
+          .set(sceneChildGroup.stripChips, {
+            y: 18,
+            autoAlpha: 0
+          }, introSetupTime)
+          .to(sceneChildGroup.stripChips, {
+            y: 0,
+            autoAlpha: 1,
+            duration: durations.chips,
+            stagger: 0.045,
+            ease: "power2.out",
+            overwrite: "auto"
+          }, startTime + childIntroOffsets.chips);
+      }
+
+      if (sceneChildGroup.quotePills.length) {
+        timeline
+          .set(sceneChildGroup.quotePills, {
+            x: 8,
+            y: 14,
+            scale: 0.98,
+            autoAlpha: 0
+          }, introSetupTime)
+          .to(sceneChildGroup.quotePills, {
+            x: 0,
+            y: 0,
+            scale: 1,
+            autoAlpha: 1,
+            duration: durations.quotes,
+            stagger: 0.08,
+            ease: "power3.out",
+            overwrite: "auto"
+          }, startTime + childIntroOffsets.quotes);
+      }
+    }
+
+    function addSceneChildOutro(timeline, sceneChildGroup, transitionStart) {
+      var cardTargets = [sceneChildGroup.mainCard, sceneChildGroup.sideCard].filter(function (target) {
+        return !!target;
+      });
+
+      if (cardTargets.length) {
+        timeline.to(cardTargets, {
+          y: -8,
+          autoAlpha: 0,
+          duration: 0.34,
+          ease: "power2.inOut",
+          overwrite: "auto"
+        }, transitionStart + childTransitionOffsets.outgoing);
+      }
+
+      if (sceneChildGroup.stripChips.length) {
+        timeline.to(sceneChildGroup.stripChips, {
+          y: -6,
+          autoAlpha: 0,
+          duration: 0.24,
+          stagger: 0.03,
+          ease: "power2.inOut",
+          overwrite: "auto"
+        }, transitionStart + childTransitionOffsets.outgoingChips);
+      }
+
+      if (sceneChildGroup.quotePills.length) {
+        timeline.to(sceneChildGroup.quotePills, {
+          y: -8,
+          autoAlpha: 0,
+          duration: 0.24,
+          stagger: 0.04,
+          ease: "power2.inOut",
+          overwrite: "auto"
+        }, transitionStart + childTransitionOffsets.outgoingQuotes);
+      }
+    }
+
+    function addSceneChildTransitionIn(timeline, sceneChildGroup, transitionStart) {
+      addSceneChildIntro(
+        timeline,
+        sceneChildGroup,
+        transitionStart + childTransitionOffsets.incoming,
+        childTransitionDurations,
+        transitionStart
+      );
+    }
+
+    function playPlayersIntro() {
+      var playersChildren = sceneChildGroups[0];
+
+      if (playersIntroPlayed || !playersChildren) {
+        return;
+      }
+
+      playersIntroPlayed = true;
+
+      if (playersIntroTimeline) {
+        playersIntroTimeline.kill();
+      }
+
+      playersIntroTimeline = window.gsap.timeline({
+        defaults: {
+          overwrite: "auto"
+        },
+        onComplete: function () {
+          playersIntroTimeline = null;
+          setSceneChildrenAtRest(playersChildren);
+        },
+        onInterrupt: function () {
+          playersIntroTimeline = null;
+        }
+      });
+
+      if (playersChildren.mainCard) {
+        playersIntroTimeline.fromTo(playersChildren.mainCard, {
+          y: 34,
+          scale: 0.985,
+          rotate: -0.8,
+          autoAlpha: 0
+        }, {
+          y: 0,
+          scale: 1,
+          rotate: 0,
+          autoAlpha: 1,
+          duration: childIntroDurations.mainCard,
+          ease: "power3.out"
+        }, 0);
+      }
+
+      if (playersChildren.sideCard) {
+        playersIntroTimeline.fromTo(playersChildren.sideCard, {
+          x: 18,
+          y: 38,
+          scale: 0.985,
+          rotate: 0.8,
+          autoAlpha: 0
+        }, {
+          x: 0,
+          y: 0,
+          scale: 1,
+          rotate: 0,
+          autoAlpha: 1,
+          duration: childIntroDurations.sideCard,
+          ease: "power3.out"
+        }, childIntroOffsets.sideCard);
+      }
+
+      if (playersChildren.stripChips.length) {
+        playersIntroTimeline.fromTo(playersChildren.stripChips, {
+          y: 18,
+          autoAlpha: 0
+        }, {
+          y: 0,
+          autoAlpha: 1,
+          duration: childIntroDurations.chips,
+          stagger: 0.045,
+          ease: "power2.out"
+        }, childIntroOffsets.chips);
+      }
+
+      if (playersChildren.quotePills.length) {
+        playersIntroTimeline.fromTo(playersChildren.quotePills, {
+          x: 8,
+          y: 14,
+          scale: 0.98,
+          autoAlpha: 0
+        }, {
+          x: 0,
+          y: 0,
+          scale: 1,
+          autoAlpha: 1,
+          duration: childIntroDurations.quotes,
+          stagger: 0.08,
+          ease: "power3.out"
+        }, childIntroOffsets.quotes);
+      }
+    }
 
     function setActiveScene(index) {
       words.forEach(function (word, wordIndex) {
@@ -539,9 +815,13 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
       });
     });
 
+    sceneChildGroups.forEach(function (sceneChildGroup) {
+      setSceneChildrenAtRest(sceneChildGroup);
+    });
+
     window.ScrollTrigger.addEventListener("refreshInit", measureAudienceLayout);
 
-    window.gsap.timeline({
+    var showcaseTimeline = window.gsap.timeline({
       defaults: {
         ease: "none"
       },
@@ -555,6 +835,23 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
         },
         invalidateOnRefresh: true,
         anticipatePin: 1,
+        onEnter: function () {
+          playPlayersIntro();
+        },
+        onRefresh: function (self) {
+          if (playersIntroTimeline) {
+            playersIntroTimeline.kill();
+            playersIntroTimeline = null;
+          }
+
+          if (self.isActive) {
+            playersIntroPlayed = true;
+
+            if (activeSceneIndex === 0) {
+              setSceneChildrenAtRest(sceneChildGroups[0]);
+            }
+          }
+        },
         onUpdate: function (self) {
           activeSceneIndex = getSceneIndex(self.progress);
           setActiveScene(activeSceneIndex);
@@ -623,6 +920,11 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
         duration: phaseDurations.ownersToPartners,
         ease: "power2.out"
       }, phasePoints.ownersHoldEnd);
+
+    addSceneChildOutro(showcaseTimeline, sceneChildGroups[0], phasePoints.playersHoldEnd);
+    addSceneChildTransitionIn(showcaseTimeline, sceneChildGroups[1], phasePoints.playersHoldEnd);
+    addSceneChildOutro(showcaseTimeline, sceneChildGroups[1], phasePoints.ownersHoldEnd);
+    addSceneChildTransitionIn(showcaseTimeline, sceneChildGroups[2], phasePoints.ownersHoldEnd);
 
     window.addEventListener("resize", function () {
       measureAudienceLayout();
