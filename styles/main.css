@@ -1713,6 +1713,22 @@ body.is-loading {
   line-height: 1.45;
 }
 
+.quote-pill__emoji-lock {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.quote-pill__emoji {
+  display: inline-block;
+  height: 1.15em;
+  width: auto;
+  max-width: 1.35rem;
+  margin-left: 0.28rem;
+  object-fit: contain;
+  vertical-align: -0.16em;
+  flex-shrink: 0;
+}
+
 .quote-pill__confetti-anchor {
   position: absolute;
   top: -0.12rem;
