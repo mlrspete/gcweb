@@ -122,9 +122,9 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
       return;
     }
 
-    var animationDuration = 145;
-    var normalTickCadence = 210;
-    var reducedTickCadence = 320;
+    var animationDuration = 96;
+    var normalTickCadence = 104;
+    var reducedTickCadence = 380;
     var value = 1000;
     var slots = [];
     var template = [];
@@ -171,7 +171,7 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
       slot.character = toCharacter;
       slot.timer = window.setTimeout(function () {
         setDigitSlot(slot, toCharacter);
-      }, animationDuration + 32);
+      }, animationDuration + 8);
     }
 
     function setSeparatorSlot(slot, character) {
@@ -416,6 +416,9 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
         quotePills: Array.prototype.slice.call(scene.querySelectorAll(".audience-scene__quotes .quote-pill"))
       };
     });
+    var playersChildren = sceneChildGroups[0];
+    var playersIntroViewportRatio = 0.98;
+    var playersIntroTriggerStart = "top " + Math.round(playersIntroViewportRatio * 100) + "%";
     var wordOffsets = [0, 0, 0];
     var progressStops = [0, 0, 0];
     var activeSceneIndex = 0;
@@ -479,6 +482,70 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
         rotate: 0,
         autoAlpha: 1
       });
+    }
+
+    function setSceneChildrenToIntroState(sceneChildGroup) {
+      if (!sceneChildGroup) {
+        return;
+      }
+
+      if (sceneChildGroup.mainCard) {
+        window.gsap.set(sceneChildGroup.mainCard, {
+          y: 34,
+          scale: 0.985,
+          rotate: -0.8,
+          autoAlpha: 0
+        });
+      }
+
+      if (sceneChildGroup.sideCard) {
+        window.gsap.set(sceneChildGroup.sideCard, {
+          x: 18,
+          y: 38,
+          scale: 0.985,
+          rotate: 0.8,
+          autoAlpha: 0
+        });
+      }
+
+      if (sceneChildGroup.stripChips.length) {
+        window.gsap.set(sceneChildGroup.stripChips, {
+          y: 18,
+          autoAlpha: 0
+        });
+      }
+
+      if (sceneChildGroup.quotePills.length) {
+        window.gsap.set(sceneChildGroup.quotePills, {
+          x: 8,
+          y: 14,
+          scale: 0.98,
+          autoAlpha: 0
+        });
+      }
+    }
+
+    function hasPlayersIntroStartPassed() {
+      return section.getBoundingClientRect().top <= (window.innerHeight * playersIntroViewportRatio);
+    }
+
+    function syncPlayersIntroState() {
+      if (!playersChildren) {
+        return;
+      }
+
+      if (playersIntroTimeline) {
+        playersIntroTimeline.kill();
+        playersIntroTimeline = null;
+      }
+
+      if (playersIntroPlayed || hasPlayersIntroStartPassed()) {
+        playersIntroPlayed = true;
+        setSceneChildrenAtRest(playersChildren);
+        return;
+      }
+
+      setSceneChildrenToIntroState(playersChildren);
     }
 
     function addSceneChildIntro(timeline, sceneChildGroup, startTime, durations, setupTime) {
@@ -610,8 +677,6 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
     }
 
     function playPlayersIntro() {
-      var playersChildren = sceneChildGroups[0];
-
       if (playersIntroPlayed || !playersChildren) {
         return;
       }
@@ -819,7 +884,25 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
       setSceneChildrenAtRest(sceneChildGroup);
     });
 
-    window.ScrollTrigger.addEventListener("refreshInit", measureAudienceLayout);
+    syncPlayersIntroState();
+
+    window.ScrollTrigger.addEventListener("refreshInit", function () {
+      measureAudienceLayout();
+      syncPlayersIntroState();
+    });
+
+    window.ScrollTrigger.create({
+      trigger: section,
+      start: playersIntroTriggerStart,
+      end: "top top",
+      invalidateOnRefresh: true,
+      onEnter: function () {
+        playPlayersIntro();
+      },
+      onRefresh: function () {
+        syncPlayersIntroState();
+      }
+    });
 
     var showcaseTimeline = window.gsap.timeline({
       defaults: {
@@ -1329,9 +1412,25 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
       liveBits.clear();
     }
 
+    function isRenderedAndVisible(element) {
+      var current = element;
+      var style;
+
+      while (current && current !== document.body) {
+        style = window.getComputedStyle(current);
+
+        if (style.display === "none" || style.visibility === "hidden" || parseFloat(style.opacity || "1") < 0.28) {
+          return false;
+        }
+
+        current = current.parentElement;
+      }
+
+      return true;
+    }
+
     function isVisiblePill(pill) {
       var rect = pill.getBoundingClientRect();
-      var scene = pill.closest(".audience-scene");
 
       if (rect.width < 1 || rect.height < 1) {
         return false;
@@ -1341,15 +1440,7 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
         return false;
       }
 
-      if (scene) {
-        var sceneStyle = window.getComputedStyle(scene);
-
-        if (sceneStyle.display === "none" || sceneStyle.visibility === "hidden" || parseFloat(sceneStyle.opacity || "1") < 0.28) {
-          return false;
-        }
-      }
-
-      return true;
+      return isRenderedAndVisible(pill);
     }
 
     function getVisiblePills() {
