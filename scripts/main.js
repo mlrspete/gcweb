@@ -460,6 +460,10 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
       outgoingQuotes: 0.36
     };
 
+    function shouldUseStaticAudienceShowcase() {
+      return window.innerWidth <= 960 || (window.innerWidth <= 1366 && window.innerHeight <= 820);
+    }
+
     function getSceneChildTargets(sceneChildGroup) {
       return [sceneChildGroup.mainCard, sceneChildGroup.sideCard]
         .concat(sceneChildGroup.stripChips, sceneChildGroup.quotePills)
@@ -865,7 +869,7 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
     measureAudienceLayout();
     applyCurrentSceneState(0);
 
-    if (state.reducedMotion || !hasGsap || !window.ScrollTrigger) {
+    if (state.reducedMotion || !hasGsap || !window.ScrollTrigger || shouldUseStaticAudienceShowcase()) {
       section.classList.add("audience-showcase--static");
       return;
     }
