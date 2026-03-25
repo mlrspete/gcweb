@@ -748,7 +748,7 @@ body.is-loading {
   display: flex;
   flex-wrap: wrap;
   align-self: end;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.7rem;
 }
 
@@ -819,21 +819,12 @@ body.is-loading {
 }
 
 .audience-scene--players .audience-scene__quotes .quote-pill {
-  border-color: rgba(248, 248, 243, 0.52);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(248, 248, 243, 0.2)),
-    rgba(248, 248, 243, 0.32);
+  border-color: rgba(248, 248, 243, 0.28);
+  background: rgba(248, 248, 243, 0.22);
   color: var(--color-charcoal);
-  box-shadow:
-    0 22px 46px -30px rgba(0, 0, 0, 0.22),
-    inset 0 0 0 1px rgba(17, 17, 17, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  --glass-highlight-top: 0.74;
-  --glass-highlight-mid: 0.26;
-  --glass-highlight-glow: 0.42;
-  --glass-highlight-opacity: 1;
+  box-shadow: 0 20px 44px -30px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .audience-scene--players .audience-scene__quotes .quote-pill:nth-child(1) {
@@ -893,8 +884,8 @@ body.is-loading {
 }
 
 .audience-scene--owners .audience-scene__quotes .quote-pill:nth-child(1) {
-  top: 21%;
-  right: 12.5%;
+  top: 20%;
+  right: 6.5%;
 }
 
 .audience-scene--owners .audience-scene__quotes .quote-pill:nth-child(2) {
@@ -918,6 +909,7 @@ body.is-loading {
   background: rgba(248, 248, 243, 0.72);
 }
 
+.quote-pill--hero,
 .audience-scene--partners .audience-scene__quotes .quote-pill {
   border-color: rgba(248, 248, 243, 0.28);
   background: rgba(248, 248, 243, 0.22);
@@ -1329,57 +1321,6 @@ body.is-loading {
   font-size: var(--text-small);
 }
 
-.cta-form__micro--celebration {
-  max-width: 32ch;
-}
-
-.quote-pill--cta {
-  justify-self: start;
-  width: fit-content;
-  max-width: min(100%, 32ch);
-  min-height: 2.4rem;
-  padding: 0.66rem 1rem 0.66rem 0.88rem;
-  gap: 0.5rem;
-  font-size: 0.82rem;
-  line-height: 1.35;
-  pointer-events: none;
-}
-
-.quote-pill--cta .quote-pill__text {
-  font-weight: 500;
-}
-
-.quote-pill--cta .quote-pill__confetti-anchor {
-  top: -0.08rem;
-  right: 0.28rem;
-  width: 0.62rem;
-  height: 0.62rem;
-  box-shadow: 0 0 0 2px rgba(248, 248, 243, 0.18);
-  opacity: 0.78;
-}
-
-.cta-form--partner .quote-pill--cta {
-  border-color: rgba(248, 248, 243, 0.16);
-  background:
-    linear-gradient(180deg, rgba(248, 248, 243, 0.16), rgba(248, 248, 243, 0.06)),
-    rgba(248, 248, 243, 0.06);
-  color: rgba(248, 248, 243, 0.82);
-  box-shadow:
-    0 18px 32px -28px rgba(0, 0, 0, 0.58),
-    inset 0 0 0 1px rgba(248, 248, 243, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  --glass-highlight-top: 0.28;
-  --glass-highlight-mid: 0.08;
-  --glass-highlight-glow: 0.2;
-  --glass-highlight-opacity: 0.72;
-}
-
-.cta-form--partner .quote-pill--cta .quote-pill__confetti-anchor {
-  box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.24);
-}
-
 .cta-panel__status {
   min-height: 1.35rem;
   margin-top: 0.9rem;
@@ -1427,20 +1368,6 @@ body.is-loading {
   .quote-pill:hover {
     transform: translateY(-2px);
     box-shadow: 0 24px 42px -28px rgba(0, 0, 0, 0.2);
-  }
-
-  .quote-pill--hero:hover {
-    box-shadow:
-      0 26px 48px -30px rgba(0, 0, 0, 0.24),
-      inset 0 0 0 1px rgba(17, 17, 17, 0.05),
-      inset 0 1px 0 rgba(255, 255, 255, 0.52);
-  }
-
-  .audience-scene--players .audience-scene__quotes .quote-pill:hover {
-    box-shadow:
-      0 26px 48px -30px rgba(0, 0, 0, 0.24),
-      inset 0 0 0 1px rgba(17, 17, 17, 0.05),
-      inset 0 1px 0 rgba(255, 255, 255, 0.52);
   }
 
   .rustpilot-card:hover {
@@ -1876,23 +1803,12 @@ body.is-loading {
 }
 
 .quote-pill--hero {
-  margin-right: 1.75rem;
+  margin-right: 1rem;
   padding-right: 1.45rem;
-  border-color: rgba(248, 248, 243, 0.52);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(248, 248, 243, 0.2)),
-    rgba(248, 248, 243, 0.32);
-  color: var(--color-charcoal);
-  box-shadow:
-    0 22px 46px -30px rgba(0, 0, 0, 0.22),
-    inset 0 0 0 1px rgba(17, 17, 17, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  --glass-highlight-top: 0.74;
-  --glass-highlight-mid: 0.26;
-  --glass-highlight-glow: 0.42;
-  --glass-highlight-opacity: 1;
+  --glass-highlight-top: 0.18;
+  --glass-highlight-mid: 0.04;
+  --glass-highlight-glow: 0.12;
+  --glass-highlight-opacity: 0.48;
   animation: audienceQuoteFloatC 11s ease-in-out infinite alternate;
 }
 
@@ -2097,7 +2013,7 @@ body.is-loading {
   }
 
   .quote-pill--hero {
-    margin-right: 0.6rem;
+    margin-right: 0.2rem;
     max-width: min(24rem, 100%);
   }
 
@@ -2155,8 +2071,8 @@ body.is-loading {
   }
 
   .audience-scene--owners .audience-scene__quotes .quote-pill:nth-child(1) {
-    top: 20%;
-    right: 10%;
+    top: 19%;
+    right: 5.5%;
   }
 
   .audience-scene--players .audience-scene__quotes .quote-pill:nth-child(2) {
