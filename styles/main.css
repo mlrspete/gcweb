@@ -940,6 +940,44 @@ body.is-loading {
   padding-block: var(--section-pad-y);
 }
 
+.audience-showcase--static .audience-showcase__topline {
+  grid-template-columns: 1fr;
+  align-items: start;
+  gap: 1rem;
+}
+
+.audience-showcase--static .audience-showcase__headline {
+  flex-wrap: wrap;
+  row-gap: 0.35rem;
+}
+
+.audience-showcase--static .audience-showcase__word-stack {
+  height: auto;
+  overflow: visible;
+}
+
+.audience-showcase--static .audience-showcase__word-track {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  transform: none !important;
+}
+
+.audience-showcase--static .audience-showcase__word {
+  flex: 0 0 auto;
+  height: auto;
+}
+
+.audience-showcase--static .audience-showcase__word:not(:last-child)::after {
+  content: "/";
+  margin-left: 0.45rem;
+  color: rgba(17, 17, 17, 0.34);
+}
+
+.audience-showcase--static .audience-showcase__progress {
+  display: none;
+}
+
 .audience-showcase--static .audience-showcase__viewport {
   display: grid;
   gap: 1rem;
@@ -2103,6 +2141,216 @@ body.is-loading {
 
   .cta-panel {
     width: min(100%, 840px);
+  }
+}
+
+@media (max-width: 960px) and (min-width: 768px) {
+  .hero__inner {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 2.4rem;
+    min-height: auto;
+    padding-top: clamp(92px, 12vw, 124px);
+    padding-bottom: clamp(76px, 10vw, 108px);
+  }
+
+  .hero__copy,
+  .hero__kicker {
+    width: min(100%, 38rem);
+    max-width: 100%;
+  }
+
+  .hero__tagline {
+    max-width: 15ch;
+  }
+
+  .hero__aside {
+    align-items: flex-start;
+    min-height: auto;
+    padding-top: 3rem;
+    gap: 0.9rem;
+  }
+
+  .hero__stamp {
+    top: 0.1rem;
+    right: 0.45rem;
+    width: 148px;
+  }
+
+  .rustpilot-card {
+    width: min(100%, 320px);
+  }
+
+  .quote-pill--hero {
+    margin-top: -0.25rem;
+    margin-right: 0;
+    max-width: min(26rem, 100%);
+  }
+
+  .hero__bar--one {
+    height: 30%;
+  }
+
+  .hero__bar--two {
+    width: min(30vw, 240px);
+  }
+
+  .audience-showcase--static .audience-scene__layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+    align-content: end;
+    gap: 0.95rem;
+    padding: 1.1rem;
+  }
+
+  .audience-showcase--static .audience-card--main,
+  .audience-showcase--static .audience-card--side,
+  .audience-showcase--static .audience-strip {
+    grid-column: auto;
+    grid-row: auto;
+    width: 100%;
+  }
+
+  .audience-showcase--static .audience-card--main {
+    max-width: 24rem;
+  }
+
+  .audience-showcase--static .audience-strip {
+    gap: 0.6rem;
+    justify-content: flex-start;
+  }
+
+  .audience-showcase--static .audience-scene__quotes {
+    position: static;
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .audience-showcase--static .audience-scene__quotes .quote-pill {
+    position: static;
+    max-width: min(100%, 24rem);
+    width: fit-content;
+  }
+
+  .audience-showcase--static .audience-scene__quotes .quote-pill:nth-child(2) {
+    justify-self: end;
+  }
+
+  .final-cta__inner {
+    align-content: start;
+    gap: 2rem;
+    min-height: auto;
+    padding-top: clamp(92px, 10vw, 120px);
+    padding-bottom: clamp(84px, 10vw, 112px);
+  }
+
+  .cta-panel {
+    width: min(100%, 100%);
+  }
+
+  .cta-panel__toggle {
+    display: grid;
+    width: 100%;
+  }
+
+  .cta-panel__tab {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .field-group--single {
+    grid-template-columns: 1fr;
+  }
+
+  .field-group--actions,
+  .field-group--single .button-pill--solid {
+    justify-items: stretch;
+  }
+}
+
+@media (max-height: 820px) and (min-width: 961px) {
+  .hero__inner {
+    align-items: start;
+    gap: clamp(2rem, 4vw, 3.2rem);
+    min-height: auto;
+    padding-top: clamp(86px, 10vh, 118px);
+    padding-bottom: clamp(70px, 8vh, 94px);
+  }
+
+  .hero__copy {
+    gap: 0.85rem;
+    width: min(100%, 36rem);
+  }
+
+  .hero__wordmark {
+    font-size: clamp(3.9rem, 9vw, 7.4rem);
+  }
+
+  .hero__tagline {
+    max-width: 12ch;
+    font-size: clamp(1.2rem, 0.9rem + 1vw, 1.65rem);
+  }
+
+  .hero__support {
+    max-width: 28ch;
+    font-size: 1rem;
+  }
+
+  .hero__aside {
+    min-height: 25rem;
+    gap: 0.85rem;
+  }
+
+  .hero__stamp {
+    right: 0.45rem;
+    width: 168px;
+  }
+
+  .rustpilot-card {
+    width: min(100%, 292px);
+    padding: 1.3rem;
+  }
+
+  .rustpilot-card__headline {
+    font-size: clamp(1.45rem, 1.1rem + 0.8vw, 1.8rem);
+  }
+
+  .rustpilot-card__stars,
+  .rustpilot-card__subline {
+    margin-top: 0.8rem;
+  }
+
+  .rustpilot-card__subline {
+    font-size: 0.9rem;
+  }
+
+  .rustpilot-card__brand {
+    margin-top: 0.95rem;
+  }
+
+  .quote-pill--hero {
+    margin-top: -1.05rem;
+    margin-right: -0.2rem;
+  }
+
+  .hero__bar--one {
+    height: 30%;
+  }
+
+  .hero__bar--two {
+    bottom: 10%;
+  }
+
+  .final-cta__inner {
+    align-content: start;
+    gap: 1.8rem;
+    min-height: auto;
+    padding-top: clamp(88px, 9vh, 112px);
+    padding-bottom: clamp(80px, 9vh, 104px);
+  }
+
+  .cta-panel {
+    width: min(100%, 820px);
   }
 }
 
