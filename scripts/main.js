@@ -1526,7 +1526,7 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
       confettiTimer = window.setTimeout(function () {
         emitBurst();
         scheduleNextBurst();
-      }, randomBetween(4000, 7000));
+      }, randomBetween(2200, 3800));
     }
 
     document.addEventListener("visibilitychange", function () {
