@@ -122,8 +122,8 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
       return;
     }
 
-    var animationDuration = 96;
-    var normalTickCadence = 104;
+    var animationDuration = 90;
+    var normalTickCadence = 98;
     var reducedTickCadence = 380;
     var value = 1000;
     var slots = [];
