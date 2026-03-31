@@ -86,6 +86,12 @@ ul {
   margin-bottom: clamp(24px, 5vw, 40px);
 }
 
+.lab-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
 .lab-backlink {
   display: inline-flex;
   align-items: center;

@@ -1,32 +1,44 @@
 import { getAssetById } from "./asset-catalog.js";
+import { defaultSiteExperimentId, getSiteExperimentById } from "./site-experiments.js";
 
 var STORAGE_KEY = "grubclub:ambient3d";
 var QUERY_KEY = "ambient3d";
+var EXPERIMENT_QUERY_KEY = "threeexp";
 var reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 var desktopWidthQuery = window.matchMedia("(min-width: 961px)");
 var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection || null;
 
-var section = document.querySelector(".final-cta");
-var canvas = document.getElementById("final-cta-environment-canvas");
+var heroSection = document.querySelector(".hero");
+var heroCanvas = document.getElementById("hero-ambient-canvas");
+var environmentSection = document.querySelector(".final-cta");
+var environmentCanvas = document.getElementById("final-cta-environment-canvas");
 var toggleButton = document.querySelector("[data-ambient-3d-toggle]");
 var ambientAsset = getAssetById("repair-bench");
+var selectedExperiment = getSelectedExperiment();
 var activeScene = null;
 var pendingStartPromise = null;
 var startToken = 0;
-var loadObserver = null;
-var sectionEligible = false;
+var environmentLoadObserver = null;
+var environmentEligible = false;
 
-if (section && canvas && toggleButton && ambientAsset) {
+if (toggleButton && ambientAsset && heroSection && environmentSection) {
   initAmbientTreatment();
 }
 
 function initAmbientTreatment() {
-  setSectionState("off");
-  canvas.setAttribute("data-environment-pose", "hidden");
+  document.documentElement.setAttribute("data-threeexp", selectedExperiment.id);
+  setHeroState("off");
+  setEnvironmentState("off");
+  setHeroPose("hidden");
+  setEnvironmentPose("hidden");
   updateToggleLabel(resolveAmbientState());
 
   toggleButton.addEventListener("click", function () {
     var state = resolveAmbientState();
+
+    if (state.reason === "baseline") {
+      return;
+    }
 
     if (state.preference === "off") {
       setStoredPreference("on");
@@ -51,6 +63,13 @@ function initAmbientTreatment() {
 
   window.addEventListener("pageshow", reevaluateAmbientTreatment);
   reevaluateAmbientTreatment();
+}
+
+function getSelectedExperiment() {
+  var params = new URLSearchParams(window.location.search);
+  var experimentId = params.get(EXPERIMENT_QUERY_KEY);
+
+  return getSiteExperimentById(experimentId) || getSiteExperimentById(defaultSiteExperimentId);
 }
 
 function getQueryPreference() {
@@ -120,6 +139,15 @@ function resolveAmbientState() {
   var webglReady = supportsWebgl();
   var autoBlockReason = detectAutoBlockReason();
 
+  if (selectedExperiment.id === "baseline") {
+    return {
+      enabled: false,
+      forced: false,
+      preference: "off",
+      reason: "baseline"
+    };
+  }
+
   if (!webglReady) {
     return {
       enabled: false,
@@ -164,31 +192,51 @@ function resolveAmbientState() {
   };
 }
 
+function getToggleBaseLabel() {
+  if (selectedExperiment.id === "hero") {
+    return "hero object";
+  }
+
+  if (selectedExperiment.id === "hero-scroll") {
+    return "hero scroll";
+  }
+
+  if (selectedExperiment.id === "environment") {
+    return "3D atmosphere";
+  }
+
+  return "3D baseline";
+}
+
 function updateToggleLabel(state) {
-  var label = "3D atmosphere off";
+  var label = getToggleBaseLabel() + " off";
   var disabled = false;
-  var title = "Toggle the environmental 3D section treatment.";
+  var title = "Toggle the active 3D experiment.";
 
   if (state.enabled) {
-    label = state.forced ? "3D atmosphere forced" : "3D atmosphere on";
+    label = state.forced ? (getToggleBaseLabel() + " forced") : (getToggleBaseLabel() + " on");
+  } else if (state.reason === "baseline") {
+    label = "3D baseline";
+    disabled = true;
+    title = "Baseline comparison mode disables all 3D.";
   } else if (state.reason === "small-screen") {
-    label = "3D atmosphere auto-off";
+    label = getToggleBaseLabel() + " auto-off";
     disabled = true;
-    title = "Environmental 3D is disabled on smaller screens.";
+    title = "The active 3D experiment is disabled on smaller screens.";
   } else if (state.reason === "reduced-motion") {
-    label = "3D atmosphere auto-off";
+    label = getToggleBaseLabel() + " auto-off";
     disabled = true;
-    title = "Environmental 3D is disabled while reduced motion is enabled.";
+    title = "The active 3D experiment is disabled while reduced motion is enabled.";
   } else if (state.reason === "save-data") {
-    label = "3D atmosphere auto-off";
+    label = getToggleBaseLabel() + " auto-off";
     disabled = true;
-    title = "Environmental 3D is disabled while data saver is enabled.";
+    title = "The active 3D experiment is disabled while data saver is enabled.";
   } else if (state.reason === "low-memory") {
-    label = "3D atmosphere auto-off";
+    label = getToggleBaseLabel() + " auto-off";
     disabled = true;
-    title = "Environmental 3D is disabled on low-memory devices.";
+    title = "The active 3D experiment is disabled on low-memory devices.";
   } else if (state.reason === "no-webgl") {
-    label = "3D atmosphere unavailable";
+    label = getToggleBaseLabel() + " unavailable";
     disabled = true;
     title = "WebGL is unavailable in this browser.";
   }
@@ -199,47 +247,98 @@ function updateToggleLabel(state) {
   toggleButton.setAttribute("aria-pressed", state.enabled ? "true" : "false");
 }
 
-function setSectionState(stateValue) {
-  section.setAttribute("data-ambient-state", stateValue);
+function setHeroState(stateValue) {
+  heroSection.setAttribute("data-ambient-state", stateValue);
 }
 
-function stopLoadObserver() {
-  if (!loadObserver) {
+function setEnvironmentState(stateValue) {
+  environmentSection.setAttribute("data-ambient-state", stateValue);
+}
+
+function setHeroPose(poseValue) {
+  if (!heroCanvas) {
     return;
   }
 
-  loadObserver.disconnect();
-  loadObserver = null;
+  heroCanvas.setAttribute("data-scroll-pose", poseValue);
 }
 
-function isSectionEligibleForLoad() {
-  var rect = section.getBoundingClientRect();
+function setEnvironmentPose(poseValue) {
+  if (!environmentCanvas) {
+    return;
+  }
+
+  environmentCanvas.setAttribute("data-environment-pose", poseValue);
+}
+
+function clearInactiveSections() {
+  setHeroState(selectedExperiment.id === "hero" || selectedExperiment.id === "hero-scroll" ? "idle" : "off");
+  setEnvironmentState(selectedExperiment.id === "environment" ? "idle" : "off");
+
+  if (selectedExperiment.id !== "hero" && selectedExperiment.id !== "hero-scroll") {
+    setHeroPose("hidden");
+  }
+
+  if (selectedExperiment.id !== "environment") {
+    setEnvironmentPose("hidden");
+  }
+}
+
+function applyDisabledState(reason) {
+  stopEnvironmentLoadObserver();
+
+  if (reason === "baseline") {
+    setHeroState("off");
+    setEnvironmentState("off");
+  } else if (selectedExperiment.id === "environment") {
+    setHeroState("off");
+    setEnvironmentState(reason === "user-off" ? "off" : "auto-off");
+  } else {
+    setHeroState(reason === "user-off" ? "off" : "auto-off");
+    setEnvironmentState("off");
+  }
+
+  setHeroPose("hidden");
+  setEnvironmentPose("hidden");
+}
+
+function stopEnvironmentLoadObserver() {
+  if (!environmentLoadObserver) {
+    return;
+  }
+
+  environmentLoadObserver.disconnect();
+  environmentLoadObserver = null;
+}
+
+function isEnvironmentEligibleForLoad() {
+  var rect = environmentSection.getBoundingClientRect();
   var viewportHeight = window.innerHeight || 1;
 
   return rect.top < (viewportHeight * 1.2) && rect.bottom > (viewportHeight * -0.15);
 }
 
-function ensureLoadObserver() {
-  if (loadObserver) {
+function ensureEnvironmentLoadObserver() {
+  if (environmentLoadObserver || selectedExperiment.id !== "environment") {
     return;
   }
 
-  loadObserver = new IntersectionObserver(function (entries) {
+  environmentLoadObserver = new IntersectionObserver(function (entries) {
     var entry = entries[0];
 
     if (!entry || !entry.isIntersecting) {
       return;
     }
 
-    sectionEligible = true;
-    stopLoadObserver();
-    bootAmbientScene();
+    environmentEligible = true;
+    stopEnvironmentLoadObserver();
+    bootActiveScene();
   }, {
     threshold: 0.16,
     rootMargin: "220px 0px"
   });
 
-  loadObserver.observe(section);
+  environmentLoadObserver.observe(environmentSection);
 }
 
 async function reevaluateAmbientTreatment() {
@@ -249,8 +348,7 @@ async function reevaluateAmbientTreatment() {
 
   if (!state.enabled) {
     startToken += 1;
-    sectionEligible = false;
-    stopLoadObserver();
+    environmentEligible = false;
 
     if (activeScene) {
       activeScene.destroy();
@@ -258,14 +356,21 @@ async function reevaluateAmbientTreatment() {
     }
 
     pendingStartPromise = null;
-    setSectionState(state.reason === "user-off" ? "off" : "auto-off");
-    canvas.setAttribute("data-environment-pose", "hidden");
+    applyDisabledState(state.reason);
     return;
   }
 
+  clearInactiveSections();
+
   if (activeScene) {
     activeScene.resume();
-    setSectionState("ready");
+
+    if (selectedExperiment.id === "environment") {
+      setEnvironmentState("ready");
+    } else {
+      setHeroState("ready");
+    }
+
     return;
   }
 
@@ -273,19 +378,30 @@ async function reevaluateAmbientTreatment() {
     return;
   }
 
-  sectionEligible = state.forced || isSectionEligibleForLoad();
+  if (selectedExperiment.id === "environment") {
+    environmentEligible = state.forced || isEnvironmentEligibleForLoad();
 
-  if (!sectionEligible) {
-    setSectionState("idle");
-    ensureLoadObserver();
+    if (!environmentEligible) {
+      setEnvironmentState("idle");
+      setEnvironmentPose("hidden");
+      ensureEnvironmentLoadObserver();
+      return;
+    }
+  } else {
+    stopEnvironmentLoadObserver();
+  }
+
+  bootActiveScene();
+}
+
+function bootActiveScene() {
+  var state = resolveAmbientState();
+
+  if (activeScene || pendingStartPromise || !state.enabled) {
     return;
   }
 
-  bootAmbientScene();
-}
-
-function bootAmbientScene() {
-  if (activeScene || pendingStartPromise || !sectionEligible || !resolveAmbientState().enabled) {
+  if (selectedExperiment.id === "environment" && !environmentEligible && !state.forced) {
     return;
   }
 
@@ -293,21 +409,36 @@ function bootAmbientScene() {
   var currentToken = startToken;
   var startPromise;
 
-  setSectionState("loading");
-  canvas.setAttribute("data-environment-pose", "loading");
+  if (selectedExperiment.id === "environment") {
+    setEnvironmentState("loading");
+    setEnvironmentPose("loading");
+  } else {
+    setHeroState("loading");
+    setHeroPose(selectedExperiment.id === "hero-scroll" ? "entry" : "static");
+  }
 
-  startPromise = startAmbientScene().then(function (sceneInstance) {
+  startPromise = startActiveScene().then(function (sceneInstance) {
     if (currentToken !== startToken || !resolveAmbientState().enabled) {
       sceneInstance.destroy();
       return;
     }
 
     activeScene = sceneInstance;
-    setSectionState("ready");
+
+    if (selectedExperiment.id === "environment") {
+      setEnvironmentState("ready");
+    } else {
+      setHeroState("ready");
+    }
   }).catch(function () {
     if (currentToken === startToken) {
-      setSectionState("error");
-      canvas.setAttribute("data-environment-pose", "hidden");
+      if (selectedExperiment.id === "environment") {
+        setEnvironmentState("error");
+        setEnvironmentPose("hidden");
+      } else {
+        setHeroState("error");
+        setHeroPose("hidden");
+      }
     }
   }).finally(function () {
     if (pendingStartPromise === startPromise) {
@@ -325,13 +456,14 @@ function bootAmbientScene() {
 function supportsWebgl() {
   try {
     var probe = document.createElement("canvas");
+
     return !!(window.WebGLRenderingContext && (probe.getContext("webgl") || probe.getContext("experimental-webgl")));
   } catch (error) {
     return false;
   }
 }
 
-async function startAmbientScene() {
+async function startActiveScene() {
   var modules = await Promise.all([
     import("three"),
     import("three/addons/loaders/FBXLoader.js")
@@ -339,12 +471,402 @@ async function startAmbientScene() {
   var THREE = modules[0];
   var FBXLoader = modules[1].FBXLoader;
 
-  return createEnvironmentSceneController(THREE, FBXLoader);
+  if (selectedExperiment.id === "environment") {
+    return createEnvironmentSceneController(THREE, FBXLoader);
+  }
+
+  return createHeroSceneController(THREE, FBXLoader, {
+    scrollLinked: selectedExperiment.id === "hero-scroll"
+  });
+}
+
+function loadBenchModel(THREE, FBXLoader, options) {
+  return new Promise(function (resolve, reject) {
+    var loader = new FBXLoader();
+
+    loader.load(
+      ambientAsset.modelUrl,
+      function (object) {
+        var runtimeMaterial = new THREE.MeshStandardMaterial({
+          color: options.material.color,
+          roughness: options.material.roughness,
+          metalness: options.material.metalness
+        });
+
+        object.traverse(function (child) {
+          if (!child.isMesh) {
+            return;
+          }
+
+          child.castShadow = true;
+          child.receiveShadow = false;
+          child.material = runtimeMaterial;
+
+          if (!child.geometry.attributes.normal) {
+            child.geometry.computeVertexNormals();
+          }
+        });
+
+        fitAndGroundObject(THREE, object, options.fitSize);
+
+        resolve({
+          object: object,
+          runtimeMaterial: runtimeMaterial
+        });
+      },
+      undefined,
+      reject
+    );
+  });
+}
+
+function fitAndGroundObject(THREE, object, fitSize) {
+  var bounds = new THREE.Box3().setFromObject(object);
+  var size = bounds.getSize(new THREE.Vector3());
+  var center = bounds.getCenter(new THREE.Vector3());
+  var maxDimension = Math.max(size.x, size.y, size.z) || 1;
+  var scaleFactor = fitSize / maxDimension;
+
+  object.scale.setScalar(scaleFactor);
+
+  bounds = new THREE.Box3().setFromObject(object);
+  center = bounds.getCenter(new THREE.Vector3());
+  object.position.sub(center);
+
+  bounds = new THREE.Box3().setFromObject(object);
+  object.position.y -= bounds.min.y;
+}
+
+function createHeroSceneController(THREE, FBXLoader, options) {
+  var scrollLinked = !!options.scrollLinked;
+  var renderer = new THREE.WebGLRenderer({
+    canvas: heroCanvas,
+    alpha: true,
+    antialias: true,
+    powerPreference: "low-power"
+  });
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(34, 1, 0.1, 40);
+  var clock = new THREE.Clock();
+  var stageRoot = new THREE.Group();
+  var rafId = 0;
+  var visibilityObserver = null;
+  var inView = true;
+  var disposed = false;
+  var modelRoot = null;
+  var runtimeMaterial = null;
+  var shadowPlane = null;
+  var scrollProgress = 0;
+  var currentPoseLabel = "";
+  var cameraTarget = new THREE.Vector3();
+  var baseCameraPosition = new THREE.Vector3(4.5, 1.65, 6.3);
+  var scrolledCameraPosition = new THREE.Vector3(4.02, 1.36, 5.68);
+  var baseLookTarget = new THREE.Vector3(0.8, 1, 0);
+  var scrolledLookTarget = new THREE.Vector3(0.48, 0.94, 0.14);
+  var baseModelPosition = new THREE.Vector3(0.95, 0.06, 0.12);
+  var scrolledModelPosition = new THREE.Vector3(0.8, 0.14, 0.01);
+  var baseRotation = new THREE.Euler(-0.1, -0.96, 0.04);
+  var scrolledRotation = new THREE.Euler(-0.06, -0.7, 0.01);
+  var baseShadowPosition = new THREE.Vector3(0.75, 0.01, 0.18);
+  var scrolledShadowPosition = new THREE.Vector3(0.66, 0.01, 0.1);
+
+  heroCanvas.setAttribute("data-engine", "three.js r165");
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.98;
+  renderer.setClearColor(0x000000, 0);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.35));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  camera.position.copy(baseCameraPosition);
+  camera.lookAt(baseLookTarget);
+
+  scene.add(new THREE.HemisphereLight(0xf6f2eb, 0x534639, 1.0));
+
+  var keyLight = new THREE.DirectionalLight(0xfff1df, 1.8);
+  keyLight.position.set(3.8, 6.6, 5.6);
+  keyLight.castShadow = true;
+  keyLight.shadow.mapSize.set(1024, 1024);
+  keyLight.shadow.camera.near = 0.5;
+  keyLight.shadow.camera.far = 18;
+  keyLight.shadow.camera.left = -4.5;
+  keyLight.shadow.camera.right = 4.5;
+  keyLight.shadow.camera.top = 4.5;
+  keyLight.shadow.camera.bottom = -4.5;
+  keyLight.shadow.bias = -0.00018;
+  scene.add(keyLight);
+
+  var rimLight = new THREE.DirectionalLight(0xd7ff00, 0.34);
+  rimLight.position.set(-3.1, 2.8, -2.4);
+  scene.add(rimLight);
+
+  var fillLight = new THREE.DirectionalLight(0xbcc8d9, 0.42);
+  fillLight.position.set(-2.6, 2.2, 3.8);
+  scene.add(fillLight);
+
+  shadowPlane = new THREE.Mesh(
+    new THREE.CircleGeometry(2.8, 48),
+    new THREE.ShadowMaterial({
+      color: 0x171111,
+      opacity: 0.12
+    })
+  );
+  shadowPlane.rotation.x = -Math.PI / 2;
+  shadowPlane.position.copy(baseShadowPosition);
+  shadowPlane.receiveShadow = true;
+  scene.add(shadowPlane);
+
+  scene.add(stageRoot);
+  updateSize();
+
+  return loadBenchModel(THREE, FBXLoader, {
+    fitSize: 4.15,
+    material: {
+      color: 0x847566,
+      roughness: 0.84,
+      metalness: 0.18
+    }
+  }).then(function (result) {
+    modelRoot = result.object;
+    runtimeMaterial = result.runtimeMaterial;
+    modelRoot.position.copy(baseModelPosition);
+    modelRoot.rotation.copy(baseRotation);
+    stageRoot.add(modelRoot);
+    updateSceneState(0, true);
+    renderFrame();
+    attachVisibilityTracking();
+    window.addEventListener("resize", updateSize);
+    document.addEventListener("visibilitychange", syncAnimationState);
+    syncAnimationState();
+
+    return {
+      resume: syncAnimationState,
+      destroy: destroy
+    };
+  });
+
+  function clamp(value, minValue, maxValue) {
+    return Math.min(Math.max(value, minValue), maxValue);
+  }
+
+  function mix(startValue, endValue, progress) {
+    return startValue + ((endValue - startValue) * progress);
+  }
+
+  function easeInOutCubic(value) {
+    if (value < 0.5) {
+      return 4 * value * value * value;
+    }
+
+    return 1 - (Math.pow(-2 * value + 2, 3) / 2);
+  }
+
+  function getHeroScrollProgress() {
+    var scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
+    var start = heroSection.offsetTop;
+    var span = Math.max(heroSection.offsetHeight * 0.92, (window.innerHeight || 1) * 0.88);
+
+    return clamp((scrollTop - start) / span, 0, 1);
+  }
+
+  function getPoseLabel(progress) {
+    if (!scrollLinked) {
+      return "static";
+    }
+
+    if (progress >= 0.74) {
+      return "settled";
+    }
+
+    if (progress >= 0.18) {
+      return "glide";
+    }
+
+    return "entry";
+  }
+
+  function updatePoseLabel(progress) {
+    var nextLabel = getPoseLabel(progress);
+
+    if (currentPoseLabel === nextLabel) {
+      return;
+    }
+
+    currentPoseLabel = nextLabel;
+    setHeroPose(nextLabel);
+  }
+
+  function updateSceneState(elapsed, snapProgress) {
+    var targetProgress = scrollLinked ? getHeroScrollProgress() : 0;
+    var poseProgress;
+    var bobAmount;
+
+    if (snapProgress) {
+      scrollProgress = targetProgress;
+    } else {
+      scrollProgress += (targetProgress - scrollProgress) * 0.085;
+
+      if (Math.abs(targetProgress - scrollProgress) < 0.0008) {
+        scrollProgress = targetProgress;
+      }
+    }
+
+    poseProgress = scrollLinked ? easeInOutCubic(clamp(scrollProgress, 0, 1)) : 0;
+    bobAmount = Math.sin(elapsed * 0.28) * mix(0.055, 0.026, poseProgress);
+
+    stageRoot.position.y = mix(0.02, -0.02, poseProgress) + bobAmount;
+
+    if (modelRoot) {
+      modelRoot.position.set(
+        mix(baseModelPosition.x, scrolledModelPosition.x, poseProgress),
+        mix(baseModelPosition.y, scrolledModelPosition.y, poseProgress),
+        mix(baseModelPosition.z, scrolledModelPosition.z, poseProgress)
+      );
+      modelRoot.rotation.x = mix(baseRotation.x, scrolledRotation.x, poseProgress) + (Math.sin(elapsed * 0.36) * mix(0.012, 0.006, poseProgress));
+      modelRoot.rotation.y = mix(baseRotation.y, scrolledRotation.y, poseProgress) + (Math.sin(elapsed * 0.22) * mix(0.06, 0.022, poseProgress));
+      modelRoot.rotation.z = mix(baseRotation.z, scrolledRotation.z, poseProgress);
+    }
+
+    shadowPlane.position.set(
+      mix(baseShadowPosition.x, scrolledShadowPosition.x, poseProgress),
+      baseShadowPosition.y,
+      mix(baseShadowPosition.z, scrolledShadowPosition.z, poseProgress)
+    );
+
+    camera.position.set(
+      mix(baseCameraPosition.x, scrolledCameraPosition.x, poseProgress),
+      mix(baseCameraPosition.y, scrolledCameraPosition.y, poseProgress),
+      mix(baseCameraPosition.z, scrolledCameraPosition.z, poseProgress)
+    );
+    cameraTarget.set(
+      mix(baseLookTarget.x, scrolledLookTarget.x, poseProgress),
+      mix(baseLookTarget.y, scrolledLookTarget.y, poseProgress),
+      mix(baseLookTarget.z, scrolledLookTarget.z, poseProgress)
+    );
+    camera.lookAt(cameraTarget);
+    updatePoseLabel(poseProgress);
+  }
+
+  function attachVisibilityTracking() {
+    visibilityObserver = new IntersectionObserver(function (entries) {
+      var entry = entries[0];
+
+      inView = entry ? entry.isIntersecting : true;
+      syncAnimationState();
+    }, {
+      threshold: 0.12
+    });
+
+    visibilityObserver.observe(heroSection);
+  }
+
+  function updateSize() {
+    var shell = heroCanvas.parentElement;
+    var width = shell.clientWidth;
+    var height = shell.clientHeight;
+
+    camera.aspect = width / Math.max(height, 1);
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height, false);
+
+    if (modelRoot) {
+      updateSceneState(clock.getElapsedTime(), true);
+      renderFrame();
+    }
+  }
+
+  function shouldAnimate() {
+    return !disposed && !!modelRoot && inView && !document.hidden;
+  }
+
+  function syncAnimationState() {
+    if (!shouldAnimate()) {
+      if (rafId) {
+        window.cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+
+      if (modelRoot) {
+        updateSceneState(clock.getElapsedTime(), true);
+      }
+
+      renderFrame();
+      return;
+    }
+
+    if (!rafId) {
+      rafId = window.requestAnimationFrame(tick);
+    }
+  }
+
+  function tick() {
+    rafId = 0;
+
+    if (!modelRoot || disposed) {
+      return;
+    }
+
+    updateSceneState(clock.getElapsedTime(), false);
+    renderFrame();
+
+    if (shouldAnimate()) {
+      rafId = window.requestAnimationFrame(tick);
+    }
+  }
+
+  function renderFrame() {
+    renderer.render(scene, camera);
+  }
+
+  function destroy() {
+    if (disposed) {
+      return;
+    }
+
+    disposed = true;
+
+    if (rafId) {
+      window.cancelAnimationFrame(rafId);
+      rafId = 0;
+    }
+
+    window.removeEventListener("resize", updateSize);
+    document.removeEventListener("visibilitychange", syncAnimationState);
+
+    if (visibilityObserver) {
+      visibilityObserver.disconnect();
+      visibilityObserver = null;
+    }
+
+    if (modelRoot) {
+      modelRoot.traverse(function (child) {
+        if (child.isMesh) {
+          child.geometry.dispose();
+        }
+      });
+    }
+
+    if (runtimeMaterial) {
+      runtimeMaterial.dispose();
+    }
+
+    if (shadowPlane) {
+      shadowPlane.geometry.dispose();
+      shadowPlane.material.dispose();
+    }
+
+    renderer.dispose();
+    renderer.clear();
+    heroCanvas.width = 0;
+    heroCanvas.height = 0;
+    setHeroPose("hidden");
+  }
 }
 
 function createEnvironmentSceneController(THREE, FBXLoader) {
   var renderer = new THREE.WebGLRenderer({
-    canvas: canvas,
+    canvas: environmentCanvas,
     alpha: true,
     antialias: true,
     powerPreference: "low-power"
@@ -355,7 +877,7 @@ function createEnvironmentSceneController(THREE, FBXLoader) {
   var stageRoot = new THREE.Group();
   var rafId = 0;
   var visibilityObserver = null;
-  var inView = isSectionVisible();
+  var inView = isEnvironmentVisible();
   var disposed = false;
   var modelRoot = null;
   var runtimeMaterial = null;
@@ -367,6 +889,7 @@ function createEnvironmentSceneController(THREE, FBXLoader) {
   var baseRotation = new THREE.Euler(-0.16, 0.72, 0.02);
   var shadowPosition = new THREE.Vector3(-0.28, 0.01, 0.12);
 
+  environmentCanvas.setAttribute("data-engine", "three.js r165");
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 0.82;
@@ -417,8 +940,20 @@ function createEnvironmentSceneController(THREE, FBXLoader) {
   scene.add(stageRoot);
   updateSize();
 
-  return loadBench().then(function () {
-    canvas.setAttribute("data-environment-pose", "anchored");
+  return loadBenchModel(THREE, FBXLoader, {
+    fitSize: 5.1,
+    material: {
+      color: 0x565049,
+      roughness: 0.94,
+      metalness: 0.08
+    }
+  }).then(function (result) {
+    modelRoot = result.object;
+    runtimeMaterial = result.runtimeMaterial;
+    modelRoot.position.copy(baseModelPosition);
+    modelRoot.rotation.copy(baseRotation);
+    stageRoot.add(modelRoot);
+    setEnvironmentPose("anchored");
     updateSceneState(0);
     renderFrame();
     attachVisibilityTracking();
@@ -432,84 +967,24 @@ function createEnvironmentSceneController(THREE, FBXLoader) {
     };
   });
 
-  function isSectionVisible() {
-    var rect = section.getBoundingClientRect();
+  function isEnvironmentVisible() {
+    var rect = environmentSection.getBoundingClientRect();
     var viewportHeight = window.innerHeight || 1;
 
     return rect.bottom > 0 && rect.top < viewportHeight;
-  }
-
-  function loadBench() {
-    return new Promise(function (resolve, reject) {
-      var loader = new FBXLoader();
-
-      loader.load(
-        ambientAsset.modelUrl,
-        function (object) {
-          var bounds;
-          var size;
-          var center;
-          var maxDimension;
-          var scaleFactor;
-
-          runtimeMaterial = new THREE.MeshStandardMaterial({
-            color: 0x565049,
-            roughness: 0.94,
-            metalness: 0.08
-          });
-
-          object.traverse(function (child) {
-            if (!child.isMesh) {
-              return;
-            }
-
-            child.castShadow = true;
-            child.receiveShadow = false;
-            child.material = runtimeMaterial;
-
-            if (!child.geometry.attributes.normal) {
-              child.geometry.computeVertexNormals();
-            }
-          });
-
-          bounds = new THREE.Box3().setFromObject(object);
-          size = bounds.getSize(new THREE.Vector3());
-          center = bounds.getCenter(new THREE.Vector3());
-          maxDimension = Math.max(size.x, size.y, size.z) || 1;
-          scaleFactor = 5.1 / maxDimension;
-
-          object.scale.setScalar(scaleFactor);
-
-          bounds = new THREE.Box3().setFromObject(object);
-          center = bounds.getCenter(new THREE.Vector3());
-          object.position.sub(center);
-
-          bounds = new THREE.Box3().setFromObject(object);
-          object.position.y -= bounds.min.y;
-          object.position.copy(baseModelPosition);
-          object.rotation.copy(baseRotation);
-
-          modelRoot = object;
-          stageRoot.add(object);
-          resolve();
-        },
-        undefined,
-        reject
-      );
-    });
   }
 
   function attachVisibilityTracking() {
     visibilityObserver = new IntersectionObserver(function (entries) {
       var entry = entries[0];
 
-      inView = entry ? entry.isIntersecting : isSectionVisible();
+      inView = entry ? entry.isIntersecting : isEnvironmentVisible();
       syncAnimationState();
     }, {
       threshold: 0.16
     });
 
-    visibilityObserver.observe(section);
+    visibilityObserver.observe(environmentSection);
   }
 
   function updateSceneState(elapsed) {
@@ -536,7 +1011,7 @@ function createEnvironmentSceneController(THREE, FBXLoader) {
   }
 
   function updateSize() {
-    var shell = canvas.parentElement;
+    var shell = environmentCanvas.parentElement;
     var width = shell.clientWidth;
     var height = shell.clientHeight;
 
@@ -632,8 +1107,8 @@ function createEnvironmentSceneController(THREE, FBXLoader) {
 
     renderer.dispose();
     renderer.clear();
-    canvas.width = 0;
-    canvas.height = 0;
-    canvas.setAttribute("data-environment-pose", "hidden");
+    environmentCanvas.width = 0;
+    environmentCanvas.height = 0;
+    setEnvironmentPose("hidden");
   }
 }

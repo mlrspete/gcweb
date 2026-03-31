@@ -1546,9 +1546,53 @@ var GRUBCLUB_FORMS_ENDPOINT = "";
     scheduleNextBurst();
   }
 
+  function getInitialFocusTargetId() {
+    var params = new URLSearchParams(window.location.search);
+
+    return params.get("focus");
+  }
+
+  function applyInitialFocus(loaderReady) {
+    var targetId = getInitialFocusTargetId();
+
+    if (!targetId) {
+      return;
+    }
+
+    loaderReady.then(function () {
+      var target;
+
+      if (targetId === "top") {
+        window.scrollTo(0, 0);
+
+        if (window.ScrollTrigger) {
+          window.ScrollTrigger.refresh();
+        }
+
+        return;
+      }
+
+      target = document.getElementById(targetId);
+
+      if (!target) {
+        return;
+      }
+
+      target.scrollIntoView({
+        behavior: "auto",
+        block: "start"
+      });
+
+      if (window.ScrollTrigger) {
+        window.ScrollTrigger.refresh();
+      }
+    });
+  }
+
   function initApp() {
     var loaderReady = initLoader();
 
+    applyInitialFocus(loaderReady);
     initHero(loaderReady);
     initAudienceShowcase();
     initFinalCta();

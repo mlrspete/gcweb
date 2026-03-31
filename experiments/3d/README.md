@@ -6,20 +6,21 @@ Use this folder as a neutral staging area for future 3D work:
 
 - `converted/` is where cleaned browser-safe `.glb` exports should go.
 - `index.html` is the current live 3D lab route.
+- `compare.html` is the internal homepage experiment comparison route.
 - `?asset=zombie-bear` and `?asset=repair-bench` can be used to open a specific harness target directly.
-- `../index.html` now uses the `repair-bench` asset as a lazy-loaded environmental prop in the final CTA background instead of a hero display piece.
+- `../index.html` now supports comparison variants through `?threeexp=baseline`, `?threeexp=hero`, `?threeexp=hero-scroll`, and `?threeexp=environment`.
 - Homepage atmosphere flags:
-  - `?ambient3d=off` disables the environmental render.
-  - `?ambient3d=force` forces the environmental render on immediately for local review.
+  - `?ambient3d=off` disables the active homepage 3D treatment.
+  - `?ambient3d=force` forces the active homepage 3D treatment on immediately for local review.
+  - `?focus=top` and `?focus=waitlist` are used by the compare route to jump previews to the relevant section.
 - Keep the original Rust-native uploads in their current folders until we decide what to keep long-term.
 - Preferred later runtime path: vanilla Three.js plus `GLTFLoader`.
 - Preferred later authoring path: inspect source assets, repair materials in Blender, then export `.glb`.
 
-## Environmental Notes
+## Homepage Variant Notes
 
-- Section chosen: final CTA / waitlist section.
-- Asset chosen: `repair-bench-from-rust/source/RepairBench.fbx`.
-- Composition: a dim left-edge workshop fragment behind the final CTA, cropped and masked so it behaves like world atmosphere rather than a product card.
-- Why this asset: the repair bench reads as Rust-native environmental dressing more naturally than the weapon assets, especially when desaturated and partially obscured.
-- Runtime approach: the scene is lazy-loaded only when the final CTA nears the viewport, then paused whenever the section leaves view.
-- Safety rails: the treatment auto-disables on smaller screens, reduced-motion setups, save-data mode, low-memory devices, and browsers without WebGL.
+- `baseline`: comparison control with all homepage 3D disabled.
+- `hero`: restrained off-axis object display in the hero.
+- `hero-scroll`: hero-object branch with a scroll-linked reframe.
+- `environment`: lazy-loaded final CTA atmosphere branch and the current default.
+- Safety rails: all non-baseline variants auto-disable on smaller screens, reduced-motion setups, save-data mode, low-memory devices, and browsers without WebGL.
