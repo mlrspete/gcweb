@@ -1456,6 +1456,29 @@ body.is-loading {
   text-transform: uppercase;
 }
 
+.site-footer__link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 0.72rem;
+  border: 1px solid rgba(248, 248, 243, 0.14);
+  border-radius: 999px;
+  background: rgba(248, 248, 243, 0.04);
+  color: var(--color-offwhite);
+  transition:
+    background-color var(--dur-fast) var(--ease-soft),
+    border-color var(--dur-fast) var(--ease-soft),
+    color var(--dur-fast) var(--ease-soft),
+    transform var(--dur-fast) var(--ease-premium);
+}
+
+.site-footer__link:hover,
+.site-footer__link:focus-visible {
+  border-color: rgba(248, 248, 243, 0.26);
+  background: rgba(248, 248, 243, 0.12);
+  color: var(--color-acid);
+  transform: translateY(-1px);
+}
+
 .button-pill--ghost {
   position: relative;
   isolation: isolate;
