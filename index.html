@@ -13,6 +13,14 @@
   >
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="styles/main.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+      }
+    }
+  </script>
 </head>
 <body class="site-body">
   <div class="site-loader" aria-hidden="true">
@@ -40,6 +48,13 @@
         <div class="hero__grid"></div>
         <div class="hero__bar hero__bar--one"></div>
         <div class="hero__bar hero__bar--two"></div>
+      </div>
+
+      <div class="hero__ambient" data-ambient-hero aria-hidden="true">
+        <div class="hero__ambient-haze"></div>
+        <div class="hero__ambient-shell">
+          <canvas class="hero__ambient-canvas" id="hero-ambient-canvas"></canvas>
+        </div>
       </div>
 
       <div class="hero__inner section-inner">
@@ -238,6 +253,12 @@
         <div class="final-cta__orb final-cta__orb--one"></div>
         <div class="final-cta__orb final-cta__orb--two"></div>
         <div class="final-cta__mesh"></div>
+        <div class="final-cta__environment" data-ambient-environment>
+          <div class="final-cta__environment-haze"></div>
+          <div class="final-cta__environment-shell">
+            <canvas class="final-cta__environment-canvas" id="final-cta-environment-canvas"></canvas>
+          </div>
+        </div>
       </div>
 
       <div class="final-cta__inner section-inner">
@@ -313,6 +334,9 @@
         <div class="site-footer__meta">
           <span>launching 2026</span>
           <span>founding access open</span>
+          <a class="site-footer__link" href="experiments/3d/">3D lab</a>
+          <a class="site-footer__link" href="experiments/3d/compare.html">3D compare</a>
+          <button class="site-footer__toggle" type="button" data-ambient-3d-toggle aria-pressed="true">3D treatment auto</button>
         </div>
       </div>
     </footer>
@@ -321,5 +345,6 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
   <script src="scripts/main.js"></script>
+  <script type="module" src="experiments/3d/ambient-treatment.js"></script>
 </body>
 </html>

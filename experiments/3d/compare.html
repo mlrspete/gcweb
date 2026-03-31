@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Internal comparison view for grubclub 3D homepage experiments.">
+  <title>grubclub 3D compare</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="icon" type="image/svg+xml" href="../../favicon.svg">
+  <link rel="stylesheet" href="./compare.css">
+</head>
+<body class="compare-page">
+  <div class="compare-shell">
+    <header class="compare-header">
+      <div class="compare-header__nav">
+        <a class="compare-link" href="../../index.html">Back to site</a>
+        <a class="compare-link" href="./index.html">3D lab</a>
+      </div>
+
+      <div class="compare-header__copy">
+        <p class="compare-eyebrow">3D experiment / milestone 6</p>
+        <h1>Homepage 3D compare</h1>
+        <p>
+          Internal view for comparing the main homepage branches side by side in one workflow: baseline, hero object,
+          scroll-linked hero, and environmental atmosphere.
+        </p>
+      </div>
+    </header>
+
+    <main class="compare-layout">
+      <aside class="compare-panel">
+        <section class="compare-card">
+          <p class="compare-card__eyebrow">Experiment switcher</p>
+          <h2>Directions</h2>
+          <p class="compare-card__body">
+            Pick a branch, inspect it in the live site frame, then switch quickly without changing commits.
+          </p>
+
+          <div class="compare-switcher" id="compare-switcher" role="tablist" aria-label="3D experiments"></div>
+        </section>
+
+        <section class="compare-card">
+          <p class="compare-card__eyebrow">Current read</p>
+          <h2 id="compare-title">No experiment selected</h2>
+          <p class="compare-card__body" id="compare-description">
+            Choose one of the available homepage experiments to load a preview.
+          </p>
+          <dl class="compare-detail-grid" id="compare-detail-grid"></dl>
+        </section>
+
+        <section class="compare-card">
+          <p class="compare-card__eyebrow">Review actions</p>
+          <h2>Inspect</h2>
+          <p class="compare-card__body" id="compare-hint">
+            The preview keeps the real site runtime intact, including the experiment flags.
+          </p>
+          <div class="compare-actions">
+            <a class="compare-action" id="compare-open-link" href="../../index.html" target="_blank" rel="noreferrer">Open current preview</a>
+            <a class="compare-action compare-action--ghost" href="../../3d-recommendation.md" target="_blank" rel="noreferrer">Open recommendation doc</a>
+          </div>
+        </section>
+      </aside>
+
+      <section class="compare-preview-card">
+        <div class="compare-preview-toolbar">
+          <div>
+            <p class="compare-card__eyebrow">Live preview</p>
+            <h2 id="compare-preview-heading">Site frame</h2>
+          </div>
+          <p class="compare-preview-note">Scroll inside the frame when testing the scroll-linked branch.</p>
+        </div>
+
+        <div class="compare-preview-frame">
+          <iframe
+            class="compare-iframe"
+            id="compare-iframe"
+            title="Homepage experiment preview"
+            loading="eager"
+          ></iframe>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./compare.js"></script>
+</body>
+</html>
