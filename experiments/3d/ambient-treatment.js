@@ -6,20 +6,23 @@ var reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 var desktopWidthQuery = window.matchMedia("(min-width: 961px)");
 var connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection || null;
 
-var hero = document.querySelector(".hero");
-var canvas = document.getElementById("hero-ambient-canvas");
+var section = document.querySelector(".final-cta");
+var canvas = document.getElementById("final-cta-environment-canvas");
 var toggleButton = document.querySelector("[data-ambient-3d-toggle]");
 var ambientAsset = getAssetById("repair-bench");
 var activeScene = null;
 var pendingStartPromise = null;
 var startToken = 0;
+var loadObserver = null;
+var sectionEligible = false;
 
-if (hero && canvas && toggleButton && ambientAsset) {
+if (section && canvas && toggleButton && ambientAsset) {
   initAmbientTreatment();
 }
 
 function initAmbientTreatment() {
-  hero.setAttribute("data-ambient-state", "off");
+  setSectionState("off");
+  canvas.setAttribute("data-environment-pose", "hidden");
   updateToggleLabel(resolveAmbientState());
 
   toggleButton.addEventListener("click", function () {
@@ -162,30 +165,30 @@ function resolveAmbientState() {
 }
 
 function updateToggleLabel(state) {
-  var label = "ambient 3D off";
+  var label = "3D atmosphere off";
   var disabled = false;
-  var title = "Toggle the ambient hero object.";
+  var title = "Toggle the environmental 3D section treatment.";
 
   if (state.enabled) {
-    label = state.forced ? "ambient 3D forced" : "ambient 3D on";
+    label = state.forced ? "3D atmosphere forced" : "3D atmosphere on";
   } else if (state.reason === "small-screen") {
-    label = "ambient 3D auto-off";
+    label = "3D atmosphere auto-off";
     disabled = true;
-    title = "Ambient 3D is disabled on smaller screens.";
+    title = "Environmental 3D is disabled on smaller screens.";
   } else if (state.reason === "reduced-motion") {
-    label = "ambient 3D auto-off";
+    label = "3D atmosphere auto-off";
     disabled = true;
-    title = "Ambient 3D is disabled while reduced motion is enabled.";
+    title = "Environmental 3D is disabled while reduced motion is enabled.";
   } else if (state.reason === "save-data") {
-    label = "ambient 3D auto-off";
+    label = "3D atmosphere auto-off";
     disabled = true;
-    title = "Ambient 3D is disabled while data saver is enabled.";
+    title = "Environmental 3D is disabled while data saver is enabled.";
   } else if (state.reason === "low-memory") {
-    label = "ambient 3D auto-off";
+    label = "3D atmosphere auto-off";
     disabled = true;
-    title = "Ambient 3D is disabled on low-memory devices.";
+    title = "Environmental 3D is disabled on low-memory devices.";
   } else if (state.reason === "no-webgl") {
-    label = "ambient 3D unavailable";
+    label = "3D atmosphere unavailable";
     disabled = true;
     title = "WebGL is unavailable in this browser.";
   }
@@ -196,8 +199,47 @@ function updateToggleLabel(state) {
   toggleButton.setAttribute("aria-pressed", state.enabled ? "true" : "false");
 }
 
-function setHeroState(stateValue) {
-  hero.setAttribute("data-ambient-state", stateValue);
+function setSectionState(stateValue) {
+  section.setAttribute("data-ambient-state", stateValue);
+}
+
+function stopLoadObserver() {
+  if (!loadObserver) {
+    return;
+  }
+
+  loadObserver.disconnect();
+  loadObserver = null;
+}
+
+function isSectionEligibleForLoad() {
+  var rect = section.getBoundingClientRect();
+  var viewportHeight = window.innerHeight || 1;
+
+  return rect.top < (viewportHeight * 1.2) && rect.bottom > (viewportHeight * -0.15);
+}
+
+function ensureLoadObserver() {
+  if (loadObserver) {
+    return;
+  }
+
+  loadObserver = new IntersectionObserver(function (entries) {
+    var entry = entries[0];
+
+    if (!entry || !entry.isIntersecting) {
+      return;
+    }
+
+    sectionEligible = true;
+    stopLoadObserver();
+    bootAmbientScene();
+  }, {
+    threshold: 0.16,
+    rootMargin: "220px 0px"
+  });
+
+  loadObserver.observe(section);
 }
 
 async function reevaluateAmbientTreatment() {
@@ -207,6 +249,8 @@ async function reevaluateAmbientTreatment() {
 
   if (!state.enabled) {
     startToken += 1;
+    sectionEligible = false;
+    stopLoadObserver();
 
     if (activeScene) {
       activeScene.destroy();
@@ -214,13 +258,14 @@ async function reevaluateAmbientTreatment() {
     }
 
     pendingStartPromise = null;
-    setHeroState(state.reason === "user-off" ? "off" : "auto-off");
+    setSectionState(state.reason === "user-off" ? "off" : "auto-off");
+    canvas.setAttribute("data-environment-pose", "hidden");
     return;
   }
 
   if (activeScene) {
     activeScene.resume();
-    setHeroState("ready");
+    setSectionState("ready");
     return;
   }
 
@@ -228,11 +273,29 @@ async function reevaluateAmbientTreatment() {
     return;
   }
 
+  sectionEligible = state.forced || isSectionEligibleForLoad();
+
+  if (!sectionEligible) {
+    setSectionState("idle");
+    ensureLoadObserver();
+    return;
+  }
+
+  bootAmbientScene();
+}
+
+function bootAmbientScene() {
+  if (activeScene || pendingStartPromise || !sectionEligible || !resolveAmbientState().enabled) {
+    return;
+  }
+
   startToken += 1;
   var currentToken = startToken;
   var startPromise;
 
-  setHeroState("loading");
+  setSectionState("loading");
+  canvas.setAttribute("data-environment-pose", "loading");
+
   startPromise = startAmbientScene().then(function (sceneInstance) {
     if (currentToken !== startToken || !resolveAmbientState().enabled) {
       sceneInstance.destroy();
@@ -240,10 +303,11 @@ async function reevaluateAmbientTreatment() {
     }
 
     activeScene = sceneInstance;
-    setHeroState("ready");
+    setSectionState("ready");
   }).catch(function () {
     if (currentToken === startToken) {
-      setHeroState("error");
+      setSectionState("error");
+      canvas.setAttribute("data-environment-pose", "hidden");
     }
   }).finally(function () {
     if (pendingStartPromise === startPromise) {
@@ -254,6 +318,7 @@ async function reevaluateAmbientTreatment() {
       updateToggleLabel(resolveAmbientState());
     }
   });
+
   pendingStartPromise = startPromise;
 }
 
@@ -274,10 +339,10 @@ async function startAmbientScene() {
   var THREE = modules[0];
   var FBXLoader = modules[1].FBXLoader;
 
-  return createAmbientSceneController(THREE, FBXLoader);
+  return createEnvironmentSceneController(THREE, FBXLoader);
 }
 
-function createAmbientSceneController(THREE, FBXLoader) {
+function createEnvironmentSceneController(THREE, FBXLoader) {
   var renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     alpha: true,
@@ -285,59 +350,67 @@ function createAmbientSceneController(THREE, FBXLoader) {
     powerPreference: "low-power"
   });
   var scene = new THREE.Scene();
-  var camera = new THREE.PerspectiveCamera(34, 1, 0.1, 40);
+  var camera = new THREE.PerspectiveCamera(32, 1, 0.1, 40);
   var clock = new THREE.Clock();
   var stageRoot = new THREE.Group();
   var rafId = 0;
   var visibilityObserver = null;
-  var inView = true;
+  var inView = isSectionVisible();
   var disposed = false;
   var modelRoot = null;
+  var runtimeMaterial = null;
   var shadowPlane = null;
+  var cameraTarget = new THREE.Vector3();
+  var baseCameraPosition = new THREE.Vector3(4.18, 1.86, 5.86);
+  var baseLookTarget = new THREE.Vector3(-0.2, 1.02, 0.08);
+  var baseModelPosition = new THREE.Vector3(-0.16, 0.02, 0.08);
+  var baseRotation = new THREE.Euler(-0.16, 0.72, 0.02);
+  var shadowPosition = new THREE.Vector3(-0.28, 0.01, 0.12);
 
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.98;
+  renderer.toneMappingExposure = 0.82;
   renderer.setClearColor(0x000000, 0);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.35));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.25));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-  camera.position.set(4.5, 1.65, 6.3);
-  camera.lookAt(0.8, 1, 0);
+  camera.position.copy(baseCameraPosition);
+  camera.lookAt(baseLookTarget);
 
-  scene.add(new THREE.HemisphereLight(0xf6f2eb, 0x534639, 1.0));
+  scene.add(new THREE.HemisphereLight(0xf1ece3, 0x1b1815, 0.86));
 
-  var keyLight = new THREE.DirectionalLight(0xfff1df, 1.8);
-  keyLight.position.set(3.8, 6.6, 5.6);
+  var keyLight = new THREE.DirectionalLight(0xf5e6d6, 1.38);
+  keyLight.position.set(4.3, 5.8, 3.6);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.set(1024, 1024);
   keyLight.shadow.camera.near = 0.5;
   keyLight.shadow.camera.far = 18;
-  keyLight.shadow.camera.left = -4.5;
-  keyLight.shadow.camera.right = 4.5;
+  keyLight.shadow.camera.left = -5;
+  keyLight.shadow.camera.right = 5;
   keyLight.shadow.camera.top = 4.5;
   keyLight.shadow.camera.bottom = -4.5;
   keyLight.shadow.bias = -0.00018;
   scene.add(keyLight);
 
-  var rimLight = new THREE.DirectionalLight(0xd7ff00, 0.34);
-  rimLight.position.set(-3.1, 2.8, -2.4);
+  var rimLight = new THREE.DirectionalLight(0x91b08f, 0.26);
+  rimLight.position.set(-4.6, 2.3, -3.2);
   scene.add(rimLight);
 
-  var fillLight = new THREE.DirectionalLight(0xbcc8d9, 0.42);
-  fillLight.position.set(-2.6, 2.2, 3.8);
+  var fillLight = new THREE.DirectionalLight(0x8090a2, 0.18);
+  fillLight.position.set(1.4, 1.8, -4.2);
   scene.add(fillLight);
 
   shadowPlane = new THREE.Mesh(
-    new THREE.CircleGeometry(2.8, 48),
+    new THREE.CircleGeometry(3.4, 48),
     new THREE.ShadowMaterial({
-      color: 0x171111,
-      opacity: 0.12
+      color: 0x050505,
+      opacity: 0.18
     })
   );
   shadowPlane.rotation.x = -Math.PI / 2;
-  shadowPlane.position.set(0.75, 0.01, 0.18);
+  shadowPlane.position.copy(shadowPosition);
+  shadowPlane.scale.set(1.55, 0.9, 1);
   shadowPlane.receiveShadow = true;
   scene.add(shadowPlane);
 
@@ -345,6 +418,9 @@ function createAmbientSceneController(THREE, FBXLoader) {
   updateSize();
 
   return loadBench().then(function () {
+    canvas.setAttribute("data-environment-pose", "anchored");
+    updateSceneState(0);
+    renderFrame();
     attachVisibilityTracking();
     window.addEventListener("resize", updateSize);
     document.addEventListener("visibilitychange", syncAnimationState);
@@ -356,6 +432,13 @@ function createAmbientSceneController(THREE, FBXLoader) {
     };
   });
 
+  function isSectionVisible() {
+    var rect = section.getBoundingClientRect();
+    var viewportHeight = window.innerHeight || 1;
+
+    return rect.bottom > 0 && rect.top < viewportHeight;
+  }
+
   function loadBench() {
     return new Promise(function (resolve, reject) {
       var loader = new FBXLoader();
@@ -363,16 +446,17 @@ function createAmbientSceneController(THREE, FBXLoader) {
       loader.load(
         ambientAsset.modelUrl,
         function (object) {
-          var material = new THREE.MeshStandardMaterial({
-            color: 0x847566,
-            roughness: 0.84,
-            metalness: 0.18
-          });
           var bounds;
           var size;
           var center;
           var maxDimension;
           var scaleFactor;
+
+          runtimeMaterial = new THREE.MeshStandardMaterial({
+            color: 0x565049,
+            roughness: 0.94,
+            metalness: 0.08
+          });
 
           object.traverse(function (child) {
             if (!child.isMesh) {
@@ -381,7 +465,7 @@ function createAmbientSceneController(THREE, FBXLoader) {
 
             child.castShadow = true;
             child.receiveShadow = false;
-            child.material = material;
+            child.material = runtimeMaterial;
 
             if (!child.geometry.attributes.normal) {
               child.geometry.computeVertexNormals();
@@ -392,7 +476,7 @@ function createAmbientSceneController(THREE, FBXLoader) {
           size = bounds.getSize(new THREE.Vector3());
           center = bounds.getCenter(new THREE.Vector3());
           maxDimension = Math.max(size.x, size.y, size.z) || 1;
-          scaleFactor = 4.15 / maxDimension;
+          scaleFactor = 5.1 / maxDimension;
 
           object.scale.setScalar(scaleFactor);
 
@@ -402,12 +486,11 @@ function createAmbientSceneController(THREE, FBXLoader) {
 
           bounds = new THREE.Box3().setFromObject(object);
           object.position.y -= bounds.min.y;
-          object.position.set(0.95, 0.06, 0.12);
-          object.rotation.set(-0.1, -0.96, 0.04);
+          object.position.copy(baseModelPosition);
+          object.rotation.copy(baseRotation);
 
           modelRoot = object;
           stageRoot.add(object);
-          renderFrame();
           resolve();
         },
         undefined,
@@ -420,13 +503,36 @@ function createAmbientSceneController(THREE, FBXLoader) {
     visibilityObserver = new IntersectionObserver(function (entries) {
       var entry = entries[0];
 
-      inView = entry ? entry.isIntersecting : true;
+      inView = entry ? entry.isIntersecting : isSectionVisible();
       syncAnimationState();
     }, {
-      threshold: 0.12
+      threshold: 0.16
     });
 
-    visibilityObserver.observe(hero);
+    visibilityObserver.observe(section);
+  }
+
+  function updateSceneState(elapsed) {
+    var sway = Math.sin(elapsed * 0.16);
+
+    stageRoot.position.x = -0.02 + (sway * 0.03);
+    stageRoot.position.y = 0.012 + (Math.sin(elapsed * 0.22) * 0.028);
+
+    if (modelRoot) {
+      modelRoot.rotation.x = baseRotation.x + (Math.sin(elapsed * 0.24) * 0.008);
+      modelRoot.rotation.y = baseRotation.y + (Math.sin(elapsed * 0.18) * 0.026);
+      modelRoot.rotation.z = baseRotation.z;
+    }
+
+    camera.position.x = baseCameraPosition.x + (sway * 0.06);
+    camera.position.y = baseCameraPosition.y + (Math.cos(elapsed * 0.12) * 0.028);
+    camera.position.z = baseCameraPosition.z + (Math.cos(elapsed * 0.1) * 0.05);
+    cameraTarget.set(
+      baseLookTarget.x + (sway * 0.03),
+      baseLookTarget.y,
+      baseLookTarget.z
+    );
+    camera.lookAt(cameraTarget);
   }
 
   function updateSize() {
@@ -437,10 +543,15 @@ function createAmbientSceneController(THREE, FBXLoader) {
     camera.aspect = width / Math.max(height, 1);
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
+
+    if (modelRoot) {
+      updateSceneState(clock.getElapsedTime());
+      renderFrame();
+    }
   }
 
   function shouldAnimate() {
-    return !disposed && !!modelRoot && inView && !document.hidden && resolveAmbientState().enabled;
+    return !disposed && !!modelRoot && inView && !document.hidden;
   }
 
   function syncAnimationState() {
@@ -448,6 +559,10 @@ function createAmbientSceneController(THREE, FBXLoader) {
       if (rafId) {
         window.cancelAnimationFrame(rafId);
         rafId = 0;
+      }
+
+      if (modelRoot) {
+        updateSceneState(clock.getElapsedTime());
       }
 
       renderFrame();
@@ -460,17 +575,13 @@ function createAmbientSceneController(THREE, FBXLoader) {
   }
 
   function tick() {
-    var elapsed = clock.getElapsedTime();
-
     rafId = 0;
 
     if (!modelRoot || disposed) {
       return;
     }
 
-    stageRoot.position.y = 0.02 + Math.sin(elapsed * 0.28) * 0.055;
-    modelRoot.rotation.y = -0.96 + Math.sin(elapsed * 0.22) * 0.06;
-    modelRoot.rotation.x = -0.1 + Math.sin(elapsed * 0.36) * 0.012;
+    updateSceneState(clock.getElapsedTime());
     renderFrame();
 
     if (shouldAnimate()) {
@@ -506,12 +617,12 @@ function createAmbientSceneController(THREE, FBXLoader) {
       modelRoot.traverse(function (child) {
         if (child.isMesh) {
           child.geometry.dispose();
-
-          if (child.material) {
-            child.material.dispose();
-          }
         }
       });
+    }
+
+    if (runtimeMaterial) {
+      runtimeMaterial.dispose();
     }
 
     if (shadowPlane) {
@@ -523,5 +634,6 @@ function createAmbientSceneController(THREE, FBXLoader) {
     renderer.clear();
     canvas.width = 0;
     canvas.height = 0;
+    canvas.setAttribute("data-environment-pose", "hidden");
   }
 }
