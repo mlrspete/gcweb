@@ -1172,7 +1172,9 @@ body.is-loading {
 .cta-panel__toggle {
   display: inline-flex;
   flex-wrap: wrap;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.35rem;
+  justify-items: stretch;
   padding: 0.35rem;
   border: 1px solid var(--cta-panel-border);
   border-radius: var(--radius-pill);
@@ -1180,13 +1182,18 @@ body.is-loading {
 }
 
 .cta-panel__tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-height: 2.95rem;
+  min-width: 0;
   padding: 0.8rem 1.15rem;
   border-radius: var(--radius-pill);
   color: var(--cta-tab-text);
   font-size: 0.92rem;
   font-weight: 600;
   letter-spacing: -0.02em;
+  text-align: center;
   transition:
     background-color var(--dur-fast) var(--ease-soft),
     color var(--dur-fast) var(--ease-soft),
