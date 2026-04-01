@@ -1,7 +1,7 @@
 import { getAssetById } from "./asset-catalog.js";
 import { defaultSiteExperimentId, getSiteExperimentById } from "./site-experiments.js";
 
-var STORAGE_KEY = "grubclub:ambient3d";
+var STORAGE_KEY = "real-rust:ambient3d";
 var QUERY_KEY = "ambient3d";
 var EXPERIMENT_QUERY_KEY = "threeexp";
 var reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -27,6 +27,7 @@ if (toggleButton && ambientAsset && heroSection && environmentSection) {
 
 function initAmbientTreatment() {
   document.documentElement.setAttribute("data-threeexp", selectedExperiment.id);
+  syncEnvironmentStageVisibility();
   setHeroState("off");
   setEnvironmentState("off");
   setHeroPose("hidden");
@@ -63,6 +64,20 @@ function initAmbientTreatment() {
 
   window.addEventListener("pageshow", reevaluateAmbientTreatment);
   reevaluateAmbientTreatment();
+}
+
+function syncEnvironmentStageVisibility() {
+  var isEnvironmentExperiment = selectedExperiment.id === "environment";
+
+  if (!environmentSection) {
+    return;
+  }
+
+  environmentSection.setAttribute("aria-hidden", isEnvironmentExperiment ? "false" : "true");
+
+  if ("inert" in environmentSection) {
+    environmentSection.inert = !isEnvironmentExperiment;
+  }
 }
 
 function getSelectedExperiment() {
@@ -116,7 +131,7 @@ function detectAutoBlockReason() {
     return "reduced-motion";
   }
 
-  if (!desktopWidthQuery.matches) {
+  if (selectedExperiment.id === "environment" && !desktopWidthQuery.matches) {
     return "small-screen";
   }
 
@@ -194,11 +209,11 @@ function resolveAmbientState() {
 
 function getToggleBaseLabel() {
   if (selectedExperiment.id === "hero") {
-    return "hero object";
+    return "translation chamber";
   }
 
   if (selectedExperiment.id === "hero-scroll") {
-    return "hero scroll";
+    return "chamber reframe";
   }
 
   if (selectedExperiment.id === "environment") {
@@ -464,18 +479,31 @@ function supportsWebgl() {
 }
 
 async function startActiveScene() {
-  var modules = await Promise.all([
-    import("three"),
-    import("three/addons/loaders/FBXLoader.js")
-  ]);
-  var THREE = modules[0];
-  var FBXLoader = modules[1].FBXLoader;
-
   if (selectedExperiment.id === "environment") {
-    return createEnvironmentSceneController(THREE, FBXLoader);
+    var environmentModules = await Promise.all([
+      import("three"),
+      import("three/addons/loaders/FBXLoader.js")
+    ]);
+
+    return createEnvironmentSceneController(environmentModules[0], environmentModules[1].FBXLoader);
   }
 
-  return createHeroSceneController(THREE, FBXLoader, {
+  var heroModules = await Promise.all([
+    import("three"),
+    import("three/addons/loaders/OBJLoader.js"),
+    import("three/addons/environments/RoomEnvironment.js"),
+    import("three/addons/geometries/RoundedBoxGeometry.js"),
+    import("./translation-chamber.js")
+  ]);
+
+  return heroModules[4].createTranslationChamberController({
+    THREE: heroModules[0],
+    OBJLoader: heroModules[1].OBJLoader,
+    RoomEnvironment: heroModules[2].RoomEnvironment,
+    RoundedBoxGeometry: heroModules[3].RoundedBoxGeometry,
+    canvas: heroCanvas,
+    section: heroSection,
+    setPose: setHeroPose,
     scrollLinked: selectedExperiment.id === "hero-scroll"
   });
 }

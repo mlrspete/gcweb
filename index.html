@@ -3,12 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="grubclub landing page placeholder.">
-  <title>grubclub</title>
+  <meta
+    name="description"
+    content="Premium Rust-native campaigns for endemic brands &mdash; designed to land inside the wipe, not on top of it."
+  >
+  <meta name="theme-color" content="#05070A">
+  <title>REAL RUST</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Sora:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   >
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -25,321 +29,177 @@
 <body class="site-body">
   <div class="site-loader" aria-hidden="true">
     <div class="site-loader__inner">
-      <div class="site-loader__accent"></div>
+      <div class="site-loader__field">
+        <div class="site-loader__slab"></div>
+        <div class="site-loader__haze"></div>
+      </div>
       <div class="site-loader__wordmark-wrap">
-        <p class="site-loader__wordmark">grubclub</p>
+        <p class="site-loader__wordmark">REAL RUST</p>
       </div>
-      <div class="site-loader__lines">
-        <span class="site-loader__line"></span>
-        <span class="site-loader__line"></span>
-        <span class="site-loader__line"></span>
-      </div>
+      <span class="site-loader__scanline"></span>
     </div>
   </div>
+
   <div class="site-noise" aria-hidden="true"></div>
 
   <main class="page-shell">
     <section class="hero" id="top">
       <div class="hero__bg" aria-hidden="true">
-        <div class="hero__plane hero__plane--base"></div>
-        <div class="hero__plane hero__plane--diagonal"></div>
-        <div class="hero__blob hero__blob--green"></div>
-        <div class="hero__blob hero__blob--lime"></div>
-        <div class="hero__grid"></div>
-        <div class="hero__bar hero__bar--one"></div>
-        <div class="hero__bar hero__bar--two"></div>
+        <div class="hero__void"></div>
+        <div class="hero__gradient hero__gradient--one"></div>
+        <div class="hero__gradient hero__gradient--two"></div>
+        <div class="hero__beam hero__beam--vertical"></div>
+        <div class="hero__beam hero__beam--horizontal"></div>
+        <div class="hero__mesh"></div>
+        <div class="hero__vignette"></div>
       </div>
 
-      <div class="hero__ambient" data-ambient-hero aria-hidden="true">
-        <div class="hero__ambient-haze"></div>
-        <div class="hero__ambient-shell">
-          <canvas class="hero__ambient-canvas" id="hero-ambient-canvas"></canvas>
-        </div>
+      <div class="hero__masthead section-inner">
+        <a class="hero__brand" href="#top" aria-label="REAL RUST home">REAL RUST</a>
       </div>
 
-      <div class="hero__inner section-inner">
+      <div class="hero__stage section-inner">
         <div class="hero__copy">
-          <p class="hero__kicker eyebrow">founding access / 2026</p>
-          <h1 class="hero__wordmark">grubclub</h1>
-          <p class="hero__tagline">One pass for better Rust.</p>
-          <p class="hero__support">Premium membership for players, server owners, and partners.</p>
-          <a class="hero__cta button-pill button-pill--ghost glass-surface" href="#waitlist">join waitlist</a>
-        </div>
-
-        <div class="hero__aside">
-          <div class="hero__stamp">
-            <svg class="hero__stamp-svg" viewBox="0 0 120 120" role="img" aria-label="coming 2026 founding access stamp">
-              <defs>
-                <path id="hero-stamp-circle" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"></path>
-              </defs>
-              <circle class="hero__stamp-ring" cx="60" cy="60" r="44"></circle>
-              <text class="hero__stamp-text">
-                <textPath href="#hero-stamp-circle" startOffset="0%">
-                  COMING 2026 &#8226; FOUNDING ACCESS &#8226; COMING 2026 &#8226;
-                </textPath>
-              </text>
-              <circle class="hero__stamp-core" cx="60" cy="60" r="16"></circle>
-              <path class="hero__stamp-cross" d="M60 42 L60 78 M42 60 L78 60"></path>
-            </svg>
-          </div>
-
-          <aside class="rustpilot-card" aria-label="RustPilot social proof card">
-            <p class="rustpilot-card__headline">F****** GOOD</p>
-
-            <div class="rustpilot-card__stars" aria-hidden="true">
-              <span class="rustpilot-card__star-box">&#9733;</span>
-              <span class="rustpilot-card__star-box">&#9733;</span>
-              <span class="rustpilot-card__star-box">&#9733;</span>
-              <span class="rustpilot-card__star-box">&#9733;</span>
-              <span class="rustpilot-card__star-box">&#9733;</span>
-            </div>
-
-            <p class="rustpilot-card__subline">
-              Based on<span class="ticker-flip" aria-live="off" aria-label="1,000">1,000</span>completely serious opinions
+          <h1 class="hero__headline">
+            <span class="hero__headline-mask">
+              <span class="hero__headline-line">We make brands</span>
+            </span>
+            <span class="hero__headline-mask">
+              <span class="hero__headline-line">belong in Rust.</span>
+            </span>
+          </h1>
+          <div class="hero__support-wrap">
+            <p class="hero__support">
+              Premium Rust-native campaigns for endemic brands &mdash; designed to land inside the wipe, not on top of it.
             </p>
-
-            <div class="rustpilot-card__brand">
-              <span class="rustpilot-card__brand-icon">&#9733;</span>
-              <span class="rustpilot-card__brand-text">RustPilot</span>
-            </div>
-          </aside>
-
-          <div class="quote-pill quote-pill--hero glass-surface">
-            <span class="quote-pill__text">queue goblin no more 😁</span>
-            <span class="quote-pill__confetti-anchor" aria-hidden="true"></span>
           </div>
-        </div>
-      </div>
-    </section>
-    <section class="audience-showcase" id="showcase">
-      <div class="audience-showcase__track">
-        <div class="audience-showcase__sticky">
-          <div class="audience-showcase__topline">
-            <div class="audience-showcase__headline" role="heading" aria-level="2">
-              <span class="audience-showcase__for">FOR</span>
 
-              <div class="audience-showcase__word-stack" aria-hidden="true">
-                <div class="audience-showcase__word-track">
-                  <span class="audience-showcase__word is-active">PLAYERS</span>
-                  <span class="audience-showcase__word">OWNERS</span>
-                  <span class="audience-showcase__word">PARTNERS</span>
+          <div class="hero__cta">
+            <div class="contact-dock" data-contact-dock>
+              <button
+                class="button-pill button-pill--solid hero__cta-button contact-dock__trigger"
+                type="button"
+                data-contact-dock-toggle
+                aria-controls="contact-dock-panel"
+                aria-expanded="false"
+              >
+                <span class="contact-dock__trigger-label">Start a conversation</span>
+              </button>
+
+              <div
+                class="contact-dock__panel"
+                id="contact-dock-panel"
+                role="group"
+                aria-label="Conversation contact options"
+                aria-hidden="true"
+              >
+                <div class="contact-dock__meta">
+                  <span class="contact-dock__meta-label">Email</span>
+                  <a class="contact-dock__address" data-contact-email href="mailto:hello@realrust.com">hello@realrust.com</a>
                 </div>
-              </div>
-            </div>
 
-            <div class="audience-showcase__progress" aria-hidden="true">
-              <div class="audience-showcase__progress-line"></div>
-              <div class="audience-showcase__progress-indicator"></div>
-              <div class="audience-showcase__progress-labels">
-                <span>01</span>
-                <span>02</span>
-                <span>03</span>
+                <div class="contact-dock__actions">
+                  <button class="contact-dock__action" type="button" data-contact-copy>Copy</button>
+                  <a class="contact-dock__action" data-contact-mail href="mailto:hello@realrust.com">Mail</a>
+                  <button class="contact-dock__action contact-dock__action--quiet" type="button" data-contact-close>
+                    Close
+                  </button>
+                </div>
+
+                <span class="contact-dock__status" aria-live="polite" aria-atomic="true"></span>
               </div>
             </div>
           </div>
+        </div>
 
-          <div class="audience-showcase__viewport">
-            <article class="audience-scene audience-scene--players is-visible" data-scene="players">
-              <div class="audience-scene__backdrop audience-scene__backdrop--players"></div>
+        <div class="hero__visual">
+          <div class="hero__slab">
+            <div class="hero__slab-shell"></div>
+            <div class="hero__slab-grid"></div>
+            <div class="hero__slab-core"></div>
+            <div class="hero__slab-reflection"></div>
 
-              <div class="audience-scene__layout">
-                <div class="audience-card audience-card--main">
-                  <p class="eyebrow">for players</p>
-                  <h3>Skip more queue.</h3>
-                  <p class="audience-card__body audience-card__body--split">
-                    <span class="audience-card__body-lead">Play now and wait less across a network of servers.</span>
-                    <span class="audience-card__body-subcopy">One membership. Shared perks and partner rewards.</span>
-                  </p>
-                </div>
-
-                <div class="audience-card audience-card--side">
-                  <p class="eyebrow">network carryover</p>
-                  <h4>Perks that travel.</h4>
-                  <p>Jump in faster, keep the VIP feel, and stack rewards across the network.</p>
-                </div>
-
-                <div class="audience-strip">
-                  <span>faster access</span>
-                  <span>network perks</span>
-                  <span>partner rewards</span>
-                </div>
-
-                <div class="audience-scene__quotes">
-                  <div class="quote-pill">
-                    <span class="quote-pill__text">wipe prep w 🔥</span>
-                    <span class="quote-pill__confetti-anchor" aria-hidden="true"></span>
-                  </div>
-
-                  <div class="quote-pill">
-                    <span class="quote-pill__text">grubmaxxing 💀</span>
-                    <span class="quote-pill__confetti-anchor" aria-hidden="true"></span>
-                  </div>
-                </div>
+            <div class="hero__ambient" data-ambient-hero aria-hidden="true">
+              <div class="hero__ambient-haze"></div>
+              <div class="hero__ambient-shell">
+                <canvas class="hero__ambient-canvas" id="hero-ambient-canvas"></canvas>
               </div>
-            </article>
+            </div>
 
-            <article class="audience-scene audience-scene--owners" data-scene="owners">
-              <div class="audience-scene__backdrop audience-scene__backdrop--owners"></div>
-
-              <div class="audience-scene__layout">
-                <div class="audience-card audience-card--main">
-                  <p class="eyebrow">for server owners</p>
-                  <h3>Monetise more.</h3>
-                  <p>Unlock shared membership revenue and promote native membership and perks.</p>
-                </div>
-
-                <div class="audience-card audience-card--side">
-                  <p class="eyebrow">why it converts</p>
-                  <h4>Seamless integration.</h4>
-                  <p>Your server stays yours. Offers stay familiar. Shared membership adds a new layer without disrupting.</p>
-                </div>
-
-                <div class="audience-strip">
-                  <span>new paying layer</span>
-                  <span>native VIP protected</span>
-                  <span>founding edge</span>
-                </div>
-
-                <div class="audience-scene__quotes">
-                  <div class="quote-pill">
-                    <span class="quote-pill__text">premium hits different ✨</span>
-                    <span class="quote-pill__confetti-anchor" aria-hidden="true"></span>
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            <article class="audience-scene audience-scene--partners" data-scene="partners">
-              <div class="audience-scene__backdrop audience-scene__backdrop--partners"></div>
-
-              <div class="audience-scene__layout">
-                <div class="audience-card audience-card--main">
-                  <p class="eyebrow">for partners</p>
-                  <h3>Distribution with upside.</h3>
-                  <p>Offer perks and promotions to a gaming-native audience primed to participate.</p>
-                </div>
-
-                <div class="audience-card audience-card--side">
-                  <p class="eyebrow">deal shape</p>
-                  <h4>Low risk.</h4>
-                  <p>Featured placement, controlled offer design, performance-led upside.</p>
-                </div>
-
-                <div class="audience-strip">
-                  <span>featured exposure</span>
-                  <span>offer control</span>
-                  <span>performance-led</span>
-                </div>
-
-                <div class="audience-scene__quotes">
-                  <div class="quote-pill">
-                    <span class="quote-pill__text">distribution to the exact crowd ⭐</span>
-                    <span class="quote-pill__confetti-anchor" aria-hidden="true"></span>
-                  </div>
-
-                  <div class="quote-pill">
-                    <span class="quote-pill__text">offer and audience fit like a glove 🤝</span>
-                    <span class="quote-pill__confetti-anchor" aria-hidden="true"></span>
-                  </div>
-                </div>
-              </div>
-            </article>
+            <div class="hero__receiver" aria-hidden="true">
+              <span class="hero__receiver-ring hero__receiver-ring--outer"></span>
+              <span class="hero__receiver-ring hero__receiver-ring--inner"></span>
+              <span class="hero__receiver-axis hero__receiver-axis--x"></span>
+              <span class="hero__receiver-axis hero__receiver-axis--y"></span>
+            </div>
           </div>
         </div>
+      </div>
+
+      <div class="final-cta panel" id="conversation" aria-hidden="true" tabindex="-1">
+        <div class="final-cta__bg" aria-hidden="true">
+          <div class="final-cta__glow final-cta__glow--one"></div>
+          <div class="final-cta__glow final-cta__glow--two"></div>
+          <div class="final-cta__grid"></div>
+
+          <div class="final-cta__environment" data-ambient-environment>
+            <div class="final-cta__environment-haze"></div>
+            <div class="final-cta__environment-shell">
+              <canvas class="final-cta__environment-canvas" id="final-cta-environment-canvas"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="final-cta__inner">
+          <div class="final-cta__header">
+            <div class="final-cta__intro">
+              <p class="final-cta__eyebrow">REAL RUST</p>
+              <h2>Start a conversation</h2>
+              <p>Tell us the brand, the moment, and the native surface you need to own.</p>
+            </div>
+          </div>
+
+          <form class="cta-form cta-form--conversation" id="conversation-form" novalidate>
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label" for="conversation-email">Email</label>
+                <input class="field" id="conversation-email" name="email" type="email" placeholder="you@brand.com" required>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label" for="conversation-brand">Brand</label>
+                <input class="field" id="conversation-brand" name="brand" type="text" placeholder="Brand or studio name" required>
+              </div>
+            </div>
+
+            <div class="field-group field-group--wide">
+              <label class="field-label" for="conversation-brief">Brief</label>
+              <textarea
+                class="field field--textarea"
+                id="conversation-brief"
+                name="brief"
+                rows="4"
+                placeholder="What needs to land, where it needs to land, and what has to feel native about it."
+                required
+              ></textarea>
+            </div>
+
+            <div class="field-group field-group--actions">
+              <button class="button-pill button-pill--solid" type="submit">Start a conversation</button>
+            </div>
+
+            <div class="cta-panel__status" aria-live="polite"></div>
+          </form>
+        </div>
+      </div>
+
+      <div class="dev-dock glass-panel" aria-label="Internal development tools" hidden>
+        <span class="dev-dock__label">Internal / dev</span>
+        <a class="dev-dock__link" href="experiments/3d/">3D lab</a>
+        <a class="dev-dock__link" href="experiments/3d/compare.html">3D compare</a>
+        <button class="dev-dock__toggle" type="button" data-ambient-3d-toggle aria-pressed="true">Translation chamber</button>
       </div>
     </section>
-    <section class="final-cta" id="waitlist">
-      <div class="final-cta__bg" aria-hidden="true">
-        <div class="final-cta__orb final-cta__orb--one"></div>
-        <div class="final-cta__orb final-cta__orb--two"></div>
-        <div class="final-cta__mesh"></div>
-        <div class="final-cta__environment" data-ambient-environment>
-          <div class="final-cta__environment-haze"></div>
-          <div class="final-cta__environment-shell">
-            <canvas class="final-cta__environment-canvas" id="final-cta-environment-canvas"></canvas>
-          </div>
-        </div>
-      </div>
-
-      <div class="final-cta__inner section-inner">
-        <div class="final-cta__intro">
-          <p class="eyebrow">founding access</p>
-          <h2>Get in early.</h2>
-          <p>Choose how you want in.</p>
-        </div>
-
-        <div class="cta-panel" data-mode="waitlist">
-          <div class="cta-panel__theme-sweep" aria-hidden="true"></div>
-
-          <div class="cta-panel__toggle" role="tablist" aria-label="conversion mode">
-            <button class="cta-panel__tab is-active" type="button" role="tab" data-mode-target="waitlist" aria-pressed="true" aria-selected="true" aria-controls="cta-form-waitlist">join waitlist</button>
-            <button class="cta-panel__tab" type="button" role="tab" data-mode-target="partner" aria-pressed="false" aria-selected="false" aria-controls="cta-form-partner">partner application</button>
-          </div>
-
-          <div class="cta-panel__forms">
-            <form class="cta-form cta-form--waitlist is-visible" id="cta-form-waitlist" novalidate>
-              <div class="field-group field-group--single">
-                <label class="sr-only" for="waitlist-email">Email</label>
-                <input class="field" id="waitlist-email" name="email" type="email" placeholder="email address" required />
-                <button class="button-pill button-pill--solid" type="submit">join waitlist</button>
-              </div>
-              <p class="cta-form__micro">No spam. No weirdness. Just launch updates.</p>
-            </form>
-
-            <form class="cta-form cta-form--partner" id="cta-form-partner" novalidate>
-              <div class="field-group">
-                <label class="sr-only" for="partner-email">Email</label>
-                <input class="field" id="partner-email" name="email" type="email" placeholder="email address" required />
-              </div>
-
-              <div class="field-group">
-                <label class="sr-only" for="partner-name">Company or server name</label>
-                <input class="field" id="partner-name" name="name" type="text" placeholder="company or server name" required />
-              </div>
-
-              <div class="field-group">
-                <label class="sr-only" for="partner-type">Partner type</label>
-                <select class="field field--select" id="partner-type" name="type" required>
-                  <option value="">partner type</option>
-                  <option value="server-owner">server owner</option>
-                  <option value="service-partner">service partner</option>
-                </select>
-              </div>
-
-              <div class="field-group">
-                <label class="sr-only" for="partner-link">Website or Discord</label>
-                <input class="field" id="partner-link" name="link" type="text" placeholder="website or discord" />
-              </div>
-
-              <div class="field-group">
-                <label class="sr-only" for="partner-message">Short note</label>
-                <textarea class="field field--textarea" id="partner-message" name="message" rows="4" placeholder="short note"></textarea>
-              </div>
-
-              <div class="field-group field-group--actions">
-                <button class="button-pill button-pill--solid" type="submit">send application</button>
-              </div>
-
-              <p class="cta-form__micro">Can&apos;t wait to get the conversation started 🎉</p>
-            </form>
-          </div>
-
-          <div class="cta-panel__status" aria-live="polite"></div>
-        </div>
-      </div>
-    </section>
-    <footer class="site-footer">
-      <div class="site-footer__inner section-inner">
-        <div class="site-footer__brand">grubclub</div>
-        <div class="site-footer__meta">
-          <span>launching 2026</span>
-          <span>founding access open</span>
-          <a class="site-footer__link" href="experiments/3d/">3D lab</a>
-          <a class="site-footer__link" href="experiments/3d/compare.html">3D compare</a>
-          <button class="site-footer__toggle" type="button" data-ambient-3d-toggle aria-pressed="true">3D treatment auto</button>
-        </div>
-      </div>
-    </footer>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>

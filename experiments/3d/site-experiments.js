@@ -33,16 +33,16 @@ export var siteExperimentCatalog = [
   },
   {
     id: "hero",
-    label: "Ambient Object",
-    navLabel: "Hero ambient",
+    label: "Translation Chamber",
+    navLabel: "Chamber",
     sectionLabel: "Hero",
-    assetLabel: "Repair bench",
-    motionLabel: "Subtle idle float",
+    assetLabel: "Abstract input -> Rust output",
+    motionLabel: "Authored chamber cycle",
     performanceLabel: "Good",
-    previewHint: "Best for judging whether a sculptural hero object feels premium or distracting.",
+    previewHint: "Core homepage scene with authored input/output motion and the slab translation surface.",
     notes: [
-      "Presents the Rust object as a display piece beside the main copy.",
-      "Strongest if the product needs a more explicit game-native signal."
+      "Uses curated abstract forms on the input side and Rust-native assets on the receiving side.",
+      "Designed as the default public hero rather than a comparison-only ornament."
     ],
     previewParams: {
       threeexp: "hero",
@@ -52,16 +52,16 @@ export var siteExperimentCatalog = [
   },
   {
     id: "hero-scroll",
-    label: "Scroll Linked",
-    navLabel: "Hero scroll",
+    label: "Chamber Reframe",
+    navLabel: "Chamber scroll",
     sectionLabel: "Hero",
-    assetLabel: "Repair bench",
-    motionLabel: "Scroll reframe",
+    assetLabel: "Abstract input -> Rust output",
+    motionLabel: "Scroll-biased chamber",
     performanceLabel: "Okay",
-    previewHint: "Scroll inside the preview to feel the reframe. This is the most motion-forward branch.",
+    previewHint: "Scroll inside the preview to feel the chamber camera bias. This remains the most motion-forward branch.",
     notes: [
-      "Adds camera and pose changes as the hero scrolls.",
-      "Useful for evaluating polish, but easiest to tip into unnecessary theatrics."
+      "Adds a restrained reframe to the chamber rather than replacing the authored loop.",
+      "Useful for judging whether scroll response adds polish or unnecessary theatricality."
     ],
     previewParams: {
       threeexp: "hero-scroll",
@@ -73,11 +73,11 @@ export var siteExperimentCatalog = [
     id: "environment",
     label: "Environmental",
     navLabel: "Environmental",
-    sectionLabel: "Final CTA",
+    sectionLabel: "Conversation stage",
     assetLabel: "Repair bench",
     motionLabel: "Low-motion atmosphere",
     performanceLabel: "Best 3D balance",
-    previewHint: "Opens at the waitlist section so the environmental fragment is visible immediately.",
+    previewHint: "Opens at the conversation stage so the environmental fragment is visible immediately.",
     notes: [
       "Uses the Rust object as world-building rather than a hero display piece.",
       "Most production-friendly direction for a premium landing page."
@@ -85,12 +85,12 @@ export var siteExperimentCatalog = [
     previewParams: {
       threeexp: "environment",
       ambient3d: "force",
-      focus: "waitlist"
+      focus: "conversation"
     }
   }
 ];
 
-export var defaultSiteExperimentId = "environment";
+export var defaultSiteExperimentId = "hero";
 
 export function getSiteExperimentById(experimentId) {
   return siteExperimentCatalog.find(function (experiment) {
