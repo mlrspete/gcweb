@@ -76,6 +76,8 @@ const palettes: Record<
   },
 };
 
+// Placeholder icon system: replace with final brand illustrations only if the
+// production identity moves beyond the current lightweight SVG set.
 function renderMotif(variant: FishIconVariant, detail: string, accent: string) {
   switch (variant) {
     case "carpenter":

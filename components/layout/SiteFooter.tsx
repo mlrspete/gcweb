@@ -4,6 +4,7 @@ const footerLinks = [
   { label: "Pricing", href: "#pricing" },
   { label: "Compliance", href: "#compliance" },
   { label: "FAQ", href: "#faq" },
+  // Replace these placeholder policy links with final legal URLs before launch.
   { label: "Privacy", href: "#" },
   { label: "Terms", href: "#" },
   { label: "Refund Policy", href: "#" },

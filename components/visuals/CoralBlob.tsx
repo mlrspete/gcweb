@@ -34,6 +34,8 @@ const variantStops: Record<
   },
 };
 
+// Placeholder coral glow primitive; keep lightweight unless final brand assets
+// require a replacement illustration.
 export function CoralBlob({
   variant = "reef",
   className,

@@ -2,6 +2,7 @@ import { Reveal } from "@/components/motion";
 import { JoinWaveForm } from "@/components/forms/JoinWaveForm";
 import { GlassCard, Section } from "@/components/ui";
 import { finalCtaContent } from "@/content/sections";
+import { packagesContent } from "@/content/packages";
 
 export function FinalCTASection() {
   return (
@@ -29,6 +30,9 @@ export function FinalCTASection() {
 
         <GlassCard variant="dark" className="p-6 sm:p-8">
           <JoinWaveForm />
+          <p className="mt-5 rounded-lg border border-pearl-white/[0.12] bg-pearl-white/[0.06] p-4 text-xs font-semibold leading-6 text-clear-water-blue/[0.78]">
+            {packagesContent.pricingDisclaimer}
+          </p>
         </GlassCard>
       </div>
     </Section>
