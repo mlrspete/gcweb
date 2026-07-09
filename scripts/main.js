@@ -519,6 +519,99 @@ var REAL_RUST_CONTACT_SUBJECT = typeof window.REAL_RUST_CONTACT_SUBJECT === "str
     });
   }
 
+  function initHeroAtmosphericOverlays(loaderReady) {
+    var hero = document.querySelector(".hero");
+    var overlayTrack;
+    var overlayRing;
+    var overlayLabel;
+
+    if (!hero) {
+      return;
+    }
+
+    overlayTrack = hero.querySelector(".hero__overlay-track");
+    overlayRing = hero.querySelector(".hero__overlay-ring");
+    overlayLabel = hero.querySelector(".hero__overlay-label--chamber");
+
+    hero.style.setProperty("--overlay-track-progress", "0.18");
+    hero.style.setProperty("--overlay-scan-progress", "0.06");
+    hero.style.setProperty("--overlay-scan-alpha", "0");
+
+    if (state.reducedMotion || !hasGsap) {
+      hero.style.setProperty("--overlay-track-progress", "0.24");
+      hero.style.setProperty("--overlay-scan-progress", "0.18");
+      hero.style.setProperty("--overlay-scan-alpha", "0.16");
+      return;
+    }
+
+    window.gsap.set([overlayTrack, overlayRing, overlayLabel].filter(Boolean), {
+      autoAlpha: 0
+    });
+
+    loaderReady.then(function () {
+      var overlayIntro = window.gsap.timeline({
+        defaults: {
+          ease: "power2.out"
+        }
+      });
+
+      if (overlayTrack) {
+        overlayIntro.to(overlayTrack, {
+          autoAlpha: 1,
+          duration: 0.42,
+          clearProps: "opacity,visibility"
+        }, 0.62);
+      }
+
+      if (overlayRing) {
+        overlayIntro.to(overlayRing, {
+          autoAlpha: 1,
+          duration: 0.54,
+          clearProps: "opacity,visibility"
+        }, 0.74);
+      }
+
+      if (overlayLabel) {
+        overlayIntro.to(overlayLabel, {
+          autoAlpha: 1,
+          duration: 0.42,
+          clearProps: "opacity,visibility"
+        }, 0.82);
+      }
+
+      window.gsap.timeline({
+        repeat: -1,
+        repeatDelay: 3.6
+      })
+        .set(hero, {
+          "--overlay-track-progress": 0.18,
+          "--overlay-scan-progress": 0.06,
+          "--overlay-scan-alpha": 0
+        })
+        .to(hero, {
+          "--overlay-scan-alpha": 0.56,
+          duration: 0.18,
+          ease: "sine.out"
+        }, 0)
+        .to(hero, {
+          "--overlay-scan-progress": 0.98,
+          "--overlay-track-progress": 0.82,
+          duration: 1.08,
+          ease: "sine.inOut"
+        }, 0.02)
+        .to(hero, {
+          "--overlay-scan-alpha": 0,
+          duration: 0.38,
+          ease: "sine.in"
+        }, 0.78)
+        .to(hero, {
+          "--overlay-track-progress": 0.26,
+          duration: 1.32,
+          ease: "sine.inOut"
+        }, 1.22);
+    });
+  }
+
   function initHeroMicroInteractions() {
     var hero = document.querySelector(".hero");
     var dock = document.querySelector("[data-contact-dock]");
@@ -1074,6 +1167,7 @@ var REAL_RUST_CONTACT_SUBJECT = typeof window.REAL_RUST_CONTACT_SUBJECT === "str
     initHeroMicroInteractions();
     applyInitialFocus(loaderReady);
     initHero(loaderReady);
+    initHeroAtmosphericOverlays(loaderReady);
     initContactDock();
     initConversationForm();
 
