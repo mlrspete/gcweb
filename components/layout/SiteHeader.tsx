@@ -90,10 +90,10 @@ export function SiteHeader() {
 
         <button
           type="button"
-          className="flex size-11 items-center justify-center rounded-full border border-current/20 lg:hidden"
+          className="flex size-11 items-center justify-center rounded-full border border-current/20 transition hover:border-reef-coral/70 focus-visible:outline-reef-coral lg:hidden"
           aria-expanded={isOpen}
           aria-controls="mobile-menu"
-          aria-label="Toggle navigation menu"
+          aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
           onClick={() => setIsOpen((value) => !value)}
         >
           <span aria-hidden="true" className="grid gap-1.5">

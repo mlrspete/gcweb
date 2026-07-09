@@ -91,7 +91,11 @@ function ErrorSummary({ errors }: { errors: FieldErrors<JoinWaveFormValues> }) {
   }
 
   return (
-    <div className="rounded-lg border border-reef-coral/50 bg-reef-coral/[0.12] p-4 text-sm font-bold text-soft-coral-pink">
+    <div
+      className="rounded-lg border border-reef-coral/50 bg-reef-coral/[0.12] p-4 text-sm font-bold text-soft-coral-pink"
+      role="alert"
+      aria-live="assertive"
+    >
       <p>Please check the highlighted fields:</p>
       <ul className="mt-2 grid gap-1">
         {messages.map((message) => (
@@ -253,8 +257,8 @@ export function JoinWaveForm() {
               ? "border-reef-coral/50 bg-reef-coral/[0.12] text-soft-coral-pink"
               : "hidden",
         )}
-        role={result ? "status" : undefined}
-        aria-live="polite"
+        role={result ? (result.ok ? "status" : "alert") : undefined}
+        aria-live={result?.ok ? "polite" : "assertive"}
       >
         {result?.message}
         {result?.ok && result.mode === "development" ? (

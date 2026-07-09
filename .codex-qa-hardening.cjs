@@ -178,7 +178,10 @@ async function collectViewportMetrics(page, viewport) {
     format: "png",
     captureBeyondViewport: false,
   });
-  const screenshotPath = path.join(process.cwd(), `.codex-qa-${viewport.label}.png`);
+  const screenshotPath = path.join(
+    process.cwd(),
+    `.codex-qa-${viewport.label}.png`,
+  );
   fs.writeFileSync(screenshotPath, Buffer.from(screenshot.data, "base64"));
 
   return { ...result.result.value, screenshotPath };
@@ -221,7 +224,10 @@ function summarizeConsoleEvents(events) {
         return ["error", "warning", "assert"].includes(event.params.type);
       }
 
-      return event.method === "Runtime.exceptionThrown" || event.method === "Log.entryAdded";
+      return (
+        event.method === "Runtime.exceptionThrown" ||
+        event.method === "Log.entryAdded"
+      );
     })
     .map((event) => {
       if (event.method === "Runtime.consoleAPICalled") {
@@ -286,27 +292,59 @@ async function main() {
 
     const failures = [];
     for (const metric of metrics) {
-      if (metric.overflow > 1) failures.push(`${metric.label}: horizontal overflow ${metric.overflow}px`);
-      if (metric.h1Count !== 1) failures.push(`${metric.label}: expected one h1, found ${metric.h1Count}`);
-      if (metric.h2Count < 10) failures.push(`${metric.label}: expected major section h2s`);
-      if (metric.pricingCtas !== 2) failures.push(`${metric.label}: expected two package CTAs`);
-      if (metric.faqButtons !== 6) failures.push(`${metric.label}: expected six FAQ buttons`);
-      if (metric.formControls < 12 || metric.formLabels < 10) failures.push(`${metric.label}: form controls/labels missing`);
-      if (metric.width < 1024 && !metric.navButtonVisible) failures.push(`${metric.label}: mobile nav button not visible`);
-      if (metric.width < 1024 && !metric.mobileMenuAfter) failures.push(`${metric.label}: mobile menu did not open`);
-      if (metric.width < 768 && metric.canvasCount !== 0) failures.push(`${metric.label}: WebGL canvas should not render on mobile`);
-      if (metric.width < 768 && metric.fallbackCount < 1) failures.push(`${metric.label}: mobile fallback hero missing`);
-      if (metric.width < 1024 && metric.faqColumns !== 1) failures.push(`${metric.label}: FAQ should be single column`);
-      if (metric.width < 1024 && !metric.packageStacked) failures.push(`${metric.label}: pricing cards should stack`);
-      if (metric.width < 900 && metric.pinSpacers > 0) failures.push(`${metric.label}: pinned section active below 900px`);
+      if (metric.overflow > 1)
+        failures.push(
+          `${metric.label}: horizontal overflow ${metric.overflow}px`,
+        );
+      if (metric.h1Count !== 1)
+        failures.push(
+          `${metric.label}: expected one h1, found ${metric.h1Count}`,
+        );
+      if (metric.h2Count < 10)
+        failures.push(`${metric.label}: expected major section h2s`);
+      if (metric.pricingCtas !== 2)
+        failures.push(`${metric.label}: expected two package CTAs`);
+      if (metric.faqButtons !== 6)
+        failures.push(`${metric.label}: expected six FAQ buttons`);
+      if (metric.formControls < 12 || metric.formLabels < 10)
+        failures.push(`${metric.label}: form controls/labels missing`);
+      if (metric.width < 1024 && !metric.navButtonVisible)
+        failures.push(`${metric.label}: mobile nav button not visible`);
+      if (metric.width < 1024 && !metric.mobileMenuAfter)
+        failures.push(`${metric.label}: mobile menu did not open`);
+      if (metric.width < 768 && metric.canvasCount !== 0)
+        failures.push(
+          `${metric.label}: WebGL canvas should not render on mobile`,
+        );
+      if (metric.width < 768 && metric.fallbackCount < 1)
+        failures.push(`${metric.label}: mobile fallback hero missing`);
+      if (metric.width < 1024 && metric.faqColumns !== 1)
+        failures.push(`${metric.label}: FAQ should be single column`);
+      if (metric.width < 1024 && !metric.packageStacked)
+        failures.push(`${metric.label}: pricing cards should stack`);
+      if (metric.width < 900 && metric.pinSpacers > 0)
+        failures.push(`${metric.label}: pinned section active below 900px`);
     }
-    if (reducedMotion.motionAttribute !== "reduced") failures.push("reduced-motion: html data attribute not set");
-    if (reducedMotion.hiddenRevealCount > 0) failures.push("reduced-motion: reveal content hidden");
-    if (reducedMotion.canvasCount > 0) failures.push("reduced-motion: WebGL canvas should not render");
-    if (reducedMotion.overflow > 1) failures.push("reduced-motion: horizontal overflow");
-    if (consoleEvents.length) failures.push(`console: ${consoleEvents.length} warnings/errors captured`);
+    if (reducedMotion.motionAttribute !== "reduced")
+      failures.push("reduced-motion: html data attribute not set");
+    if (reducedMotion.hiddenRevealCount > 0)
+      failures.push("reduced-motion: reveal content hidden");
+    if (reducedMotion.canvasCount > 0)
+      failures.push("reduced-motion: WebGL canvas should not render");
+    if (reducedMotion.overflow > 1)
+      failures.push("reduced-motion: horizontal overflow");
+    if (consoleEvents.length)
+      failures.push(
+        `console: ${consoleEvents.length} warnings/errors captured`,
+      );
 
-    console.log(JSON.stringify({ metrics, reducedMotion, consoleEvents, failures }, null, 2));
+    console.log(
+      JSON.stringify(
+        { metrics, reducedMotion, consoleEvents, failures },
+        null,
+        2,
+      ),
+    );
 
     if (failures.length) process.exitCode = 1;
   } finally {
