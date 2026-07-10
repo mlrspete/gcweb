@@ -222,14 +222,26 @@ export function HeroSection() {
               href="#pricing"
               data-cta="join-next-wave"
               className="motion-cta inline-flex min-h-14 items-center justify-center rounded-full bg-reef-coral px-7 text-base font-extrabold text-deep-ocean-navy shadow-coral-glow hover:bg-soft-coral-pink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-reef-coral focus-visible:ring-4 focus-visible:ring-reef-coral/25"
-              onClick={() => trackCTAClick(heroContent.primaryCta, "hero")}
+              onClick={() =>
+                trackCTAClick(
+                  heroContent.primaryCta,
+                  "hero-primary",
+                  "review-system-offer",
+                )
+              }
             >
               {heroContent.primaryCta}
             </a>
             <a
               href="#how-it-works"
               className="motion-cta inline-flex min-h-14 items-center justify-center rounded-full border border-pearl-white/[0.16] bg-pearl-white/[0.07] px-7 text-base font-extrabold text-pearl-white backdrop-blur-sm hover:border-seafoam/60 hover:bg-pearl-white/[0.12] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-reef-coral focus-visible:ring-4 focus-visible:ring-reef-coral/25"
-              onClick={() => trackCTAClick(heroContent.scrollCue, "hero")}
+              onClick={() =>
+                trackCTAClick(
+                  heroContent.scrollCue,
+                  "hero-secondary",
+                  "review-system-journey",
+                )
+              }
             >
               {heroContent.scrollCue}
             </a>

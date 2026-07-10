@@ -252,7 +252,20 @@ export function FitCheckForm({
                 value={option.value}
                 className="sr-only"
               />
-              <span>{option.label}</span>
+              <span className="inline-flex items-center gap-2">
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "inline-flex size-5 shrink-0 items-center justify-center rounded-full border text-xs leading-none",
+                    watchedValues.customerVolume === option.value
+                      ? "border-deep-ocean-navy bg-pearl-white text-deep-ocean-navy"
+                      : "border-current/45 bg-transparent text-transparent",
+                  )}
+                >
+                  ✓
+                </span>
+                <span>{option.label}</span>
+              </span>
             </label>
           ))}
         </div>

@@ -11,8 +11,11 @@ export type SiteContent = {
     title: string;
     titleTemplate: string;
     description: string;
+    openGraphTitle: string;
+    openGraphDescription: string;
     siteName: string;
     ogImagePath: string;
+    ogImageAlt: string;
     twitterCard: "summary_large_image";
     canonicalPath: string;
   };

@@ -13,6 +13,10 @@ function readProjectFile(filePath) {
   return readFileSync(join(rootDir, filePath), "utf8");
 }
 
+function readProjectBuffer(filePath) {
+  return readFileSync(join(rootDir, filePath));
+}
+
 function projectPathExists(filePath) {
   return existsSync(join(rootDir, filePath));
 }
@@ -133,6 +137,7 @@ const deletedFiles = [
   "app/actions/joinWave.ts",
   "app/api/checkout/route.ts",
   "lib/stripe.ts",
+  "docs/vercel-migration.md",
 ];
 
 for (const filePath of deletedFiles) {
@@ -231,6 +236,189 @@ if (projectPathExists("package-lock.json")) {
   }
 }
 
+const siteSource = readProjectFile("content/site.ts");
+const layoutSource = readProjectFile("app/layout.tsx");
+const sitemapSource = readProjectFile("app/sitemap.ts");
+const robotsSource = readProjectFile("app/robots.ts");
+const analyticsSource = readProjectFile("lib/analytics.ts");
+const envExample = readProjectFile(".env.example");
+
+const requiredMetadataValues = [
+  "Growth Specialists | Custom Google Review Collection Systems",
+  "%s | Growth Specialists",
+  "Tailored Google review collection systems for small businesses, built around genuine customers, existing tools and compliant requests for honest feedback.",
+  "Custom Review Capture Systems | Growth Specialists",
+  "We audit your customer journey, find missed review-request moments and build a repeatable system into the workflow your business already uses.",
+  "summary_large_image",
+];
+
+for (const value of requiredMetadataValues) {
+  if (!siteSource.includes(value)) {
+    fail(`Required metadata value is missing: ${value}`);
+  }
+}
+
+for (const metadataField of [
+  "siteContent.metadata.openGraphTitle",
+  "siteContent.metadata.openGraphDescription",
+  "siteContent.metadata.ogImageAlt",
+]) {
+  if (!layoutSource.includes(metadataField)) {
+    fail(`Root metadata does not use ${metadataField}.`);
+  }
+}
+
+const requiredSchemaValues = [
+  '"@type": "ProfessionalService"',
+  'serviceType: "Custom Google Review Collection System Setup"',
+  'price: "299"',
+  'priceCurrency: "AUD"',
+  "A one-off workflow audit, review-request system design, digital asset build, standard implementation and handoff for suitable small businesses.",
+];
+
+for (const value of requiredSchemaValues) {
+  if (!pageSource.includes(value)) {
+    fail(`Required service schema value is missing: ${value}`);
+  }
+}
+
+const prohibitedSchemaPatterns = [
+  /"@type":\s*"AggregateRating"/,
+  /"@type":\s*"Review"/,
+  /\bratingValue\s*:/,
+  /\breviewCount\s*:/,
+  /\baggregateRating\s*:/,
+  /\baddress\s*:/,
+  /\btelephone\s*:/,
+  /\baward\s*:/,
+];
+
+for (const pattern of prohibitedSchemaPatterns) {
+  if (pattern.test(pageSource)) {
+    fail(`Prohibited service schema matched ${pattern}.`);
+  }
+}
+
+for (const route of ["/", "/privacy", "/terms", "/satisfaction-guarantee"]) {
+  if (!sitemapSource.includes(`"${route}"`)) {
+    fail(`Sitemap is missing ${route}.`);
+  }
+}
+
+if (!robotsSource.includes("process.env.VERCEL_ENV")) {
+  fail("Robots policy does not distinguish preview deployments.");
+}
+
+if (!robotsSource.includes('disallow: "/api/"')) {
+  fail("Production robots policy does not exclude internal API routes.");
+}
+
+const requiredAnalyticsEvents = [
+  "cta_click",
+  "fit_check_opened",
+  "fit_check_started",
+  "fit_check_completed",
+  "fit_result_viewed",
+  "manual_review_started",
+  "manual_review_submitted",
+  "manual_review_failed",
+];
+
+for (const eventName of requiredAnalyticsEvents) {
+  if (!analyticsSource.includes(`"${eventName}"`)) {
+    fail(`Analytics event ${eventName} is missing.`);
+  }
+}
+
+for (const eventName of [
+  "package_select",
+  "checkout_started",
+  "checkout_completed",
+  "visibility_wave",
+]) {
+  if (analyticsSource.includes(eventName)) {
+    fail(`Obsolete analytics event ${eventName} remains.`);
+  }
+}
+
+if (!analyticsSource.includes("destination")) {
+  fail("CTA analytics does not identify the review-system destination.");
+}
+
+for (const unsupportedVariable of [
+  "NEXT_PUBLIC_GA_MEASUREMENT_ID",
+  "NEXT_PUBLIC_GTM_ID",
+]) {
+  if (envExample.includes(unsupportedVariable)) {
+    fail(`Unsupported analytics variable ${unsupportedVariable} remains.`);
+  }
+}
+
+for (const sourceUrl of [
+  "https://www.brightlocal.com/research/local-consumer-review-survey/",
+  "https://support.google.com/business/answer/7091?hl=en",
+]) {
+  if (!reviewSystemSource.includes(sourceUrl)) {
+    fail(`Approved source URL is missing: ${sourceUrl}`);
+  }
+}
+
+const faqSource = readProjectFile("components/sections/FAQSection.tsx");
+
+if (
+  !faqSource.includes(
+    "https://support.google.com/contributionpolicy/answer/7400114?hl=en",
+  )
+) {
+  fail("Approved Google contribution policy URL is missing.");
+}
+
+const analyticsDocsPath = "docs/analytics-events.md";
+
+if (!projectPathExists(analyticsDocsPath)) {
+  fail("Analytics event documentation is missing.");
+} else {
+  const analyticsDocs = readProjectFile(analyticsDocsPath);
+
+  for (const eventName of requiredAnalyticsEvents) {
+    if (!analyticsDocs.includes(`\`${eventName}\``)) {
+      fail(`Analytics documentation is missing ${eventName}.`);
+    }
+  }
+
+  for (const prohibitedPii of [
+    "email addresses",
+    "contact names",
+    "business names",
+    "phone numbers",
+    "raw form values",
+  ]) {
+    if (!analyticsDocs.includes(prohibitedPii)) {
+      fail(`Analytics documentation does not prohibit ${prohibitedPii}.`);
+    }
+  }
+}
+
+const ogImagePath = "public/og-growth-specialists.png";
+
+if (!projectPathExists(ogImagePath)) {
+  fail("Open Graph image is missing.");
+} else {
+  const ogImage = readProjectBuffer(ogImagePath);
+  const pngSignature = "89504e470d0a1a0a";
+
+  if (ogImage.subarray(0, 8).toString("hex") !== pngSignature) {
+    fail("Open Graph image is not a PNG file.");
+  } else {
+    const width = ogImage.readUInt32BE(16);
+    const height = ogImage.readUInt32BE(20);
+
+    if (width !== 1200 || height !== 630) {
+      fail(`Open Graph image must be 1200x630; found ${width}x${height}.`);
+    }
+  }
+}
+
 const scannedFiles = [
   ...listFiles("app"),
   ...listFiles("components"),
@@ -243,6 +431,7 @@ const scannedFiles = [
   "docs/env-checklist.md",
   "docs/final-launch-report.md",
   "docs/qa-report.md",
+  "docs/analytics-events.md",
 ].filter((filePath) => projectPathExists(filePath));
 
 const legacyTerms = [

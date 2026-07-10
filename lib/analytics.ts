@@ -58,10 +58,15 @@ function emitAnalyticsEvent(
   );
 }
 
-export function trackCTAClick(label: string, location: string) {
+export function trackCTAClick(
+  label: string,
+  location: string,
+  destination: string,
+) {
   emitAnalyticsEvent("cta_click", {
     label,
     location,
+    destination,
   });
 }
 

@@ -12,7 +12,9 @@
     "format:write": "prettier . --write",
     "check:frozen": "node scripts/check-frozen-copy.mjs",
     "check:pivot-content": "node scripts/check-pivot-content.mjs",
-    "check:pivot": "node scripts/check-pivot-invariants.mjs"
+    "check:pivot": "node scripts/check-pivot-invariants.mjs",
+    "qa:pivot": "node .codex-qa-hardening.cjs",
+    "validate": "npm run format && npm run typecheck && npm run lint && npm run check:frozen && npm run check:pivot-content && npm run check:pivot && npm run build"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.2.8",

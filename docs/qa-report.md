@@ -4,7 +4,8 @@ Date: 2026-07-10
 
 ## Current Scope
 
-This report reflects the integrated Custom Review Capture System pivot after legacy public sections and checkout code were removed.
+This report covers the integrated Custom Review Capture System through
+Milestone 7, including operational and machine-readable surfaces.
 
 ## Automated Validation
 
@@ -16,28 +17,38 @@ This report reflects the integrated Custom Review Capture System pivot after leg
 - `npm run check:pivot`
 - `npm run build`
 
-## Key Acceptance Checks
+## Acceptance Checks
 
-- Root page renders the final order only: hero, signal ticker, review gap, journey, offer and FAQ.
-- The frozen header, hero and ticker copy remain protected by `check:frozen`.
-- The canonical pivot content remains protected by `check:pivot-content`.
-- The integrated architecture, removed checkout route and legacy-term constraints are protected by `check:pivot`.
-- The public offer shows one product and one price: `$299 AUD`.
-- Stage One of the fit check contains no name, phone or email fields.
-- `/privacy`, `/terms` and `/satisfaction-guarantee` resolve.
-- `/api/checkout` returns 404 after build/start.
+- Root page renders the approved final order and exactly one H1.
+- Frozen header, hero and ticker copy remains protected.
+- One `$299 AUD` offer is represented in both public copy and service schema.
+- Stage One requests no name, phone number or email.
+- Root metadata uses the approved search, Open Graph and Twitter copy.
+- Policy pages have unique templated titles and canonical URLs.
+- Open Graph artwork is `1200x630` and contains no ratings, counts or third-party
+  logos.
+- JSON-LD serializes validly and includes no rating or review schema.
+- Sitemap exposes only `/`, `/privacy`, `/terms` and
+  `/satisfaction-guarantee`.
+- Preview robots block indexing; production robots allow public pages and
+  disallow `/api/`.
+- Source labels link to the approved BrightLocal and Google pages.
+- Analytics taxonomy contains only generic CTA, fit-check and manual-review
+  events, with no intended PII.
+- The site remains functional when no analytics runtime is present.
 
 ## Manual Browser Areas For Milestone 8
 
-- Cross-viewport layout at 360, 390, 768, 1024, 1440 and 1920.
+- Cross-viewport layout at 360, 390, 768, 1024, 1440 and 1920 pixels.
 - Compliance hash opening FAQ 05.
-- Fit-check dialog focus trapping, state persistence and failure preservation.
-- Reduced-motion behavior for hero, review flow, journey, counters and FAQ.
+- Dialog focus trapping, state persistence and failure preservation.
+- Reduced-motion behavior for hero, review flow, journey and counters.
 - Console and hydration cleanliness.
-- Lighthouse/accessibility/performance measurements.
+- Lighthouse accessibility and performance measurements.
+- Native-browser inspection of rendered metadata and JSON-LD.
 
 ## Remaining Known Limitations
 
-- Final native browser and Lighthouse hardening is scheduled for Milestone 8.
-- Real deployed email delivery is scheduled for the release milestone.
+- Final browser and Lighthouse hardening is scheduled for Milestone 8.
+- Real deployed email delivery is a release task.
 - Legal review remains required before accepting payment invitations.

@@ -45,6 +45,7 @@ function ImpactModule({
         href={getSourceUrl(impact.sourceLabel)}
         target="_blank"
         rel="noreferrer"
+        aria-label={`${impact.sourceLabel} (opens in a new tab)`}
         className="mt-4 inline-flex text-sm font-extrabold uppercase tracking-normal text-deep-ocean-navy/58 underline decoration-deep-ocean-navy/20 underline-offset-4 transition hover:text-reef-coral focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-reef-coral"
       >
         {impact.sourceLabel}
@@ -78,6 +79,7 @@ function SourceNote() {
         href={source.url}
         target="_blank"
         rel="noreferrer"
+        aria-label={`${source.label} (opens in a new tab)`}
         className="font-extrabold text-deep-ocean-navy underline decoration-deep-ocean-navy/20 underline-offset-4 transition hover:text-reef-coral focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-reef-coral"
       >
         {source.label}

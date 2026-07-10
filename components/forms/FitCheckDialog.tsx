@@ -129,12 +129,6 @@ function getSourcePage() {
   return window.location.href;
 }
 
-function focusFitCheckTrigger() {
-  document
-    .querySelector<HTMLButtonElement>("[data-fit-check-trigger]")
-    ?.focus();
-}
-
 function getResultContent(category: PreliminaryResultCategory) {
   return category === "potential-fit"
     ? content.results.potentialFit
@@ -391,6 +385,7 @@ export function FitCheckDialog({
   const [resetKey, setResetKey] = useState(0);
   const hasStartedRef = useRef(false);
   const submissionErrorRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const analyticsInput = useMemo(
     () => getAnalyticsInput(fitCheckValues, resultCategory, ctaLocation),
@@ -419,7 +414,7 @@ export function FitCheckDialog({
       return;
     }
 
-    window.setTimeout(focusFitCheckTrigger, 20);
+    window.setTimeout(() => triggerRef.current?.focus(), 20);
   }
 
   function handleStarted() {
@@ -515,6 +510,7 @@ export function FitCheckDialog({
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Trigger asChild>
         <button
+          ref={triggerRef}
           type="button"
           data-fit-check-trigger
           className={cn(
@@ -532,7 +528,7 @@ export function FitCheckDialog({
           data-fit-check-step={step}
           onCloseAutoFocus={(event) => {
             event.preventDefault();
-            focusFitCheckTrigger();
+            triggerRef.current?.focus();
           }}
           className={cn(
             "fixed inset-x-3 bottom-3 top-3 z-50 flex overflow-hidden rounded-lg border border-pearl-white/[0.16] bg-deep-ocean-navy text-pearl-white shadow-ocean-soft outline-none",

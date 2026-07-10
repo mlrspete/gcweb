@@ -35,6 +35,7 @@ function renderFaqAnswer(item: ReviewSystemFaqItem): ReactNode {
         href={googlePolicyUrl}
         target="_blank"
         rel="noreferrer"
+        aria-label={`${googlePolicyPhrase} (opens in a new tab)`}
         className="font-extrabold text-deep-ocean-navy underline decoration-deep-ocean-navy/20 underline-offset-4 transition hover:text-reef-coral focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-reef-coral"
       >
         {googlePolicyPhrase}
@@ -93,11 +94,13 @@ export function FAQSection() {
   }, [openAndScrollCompliance]);
 
   useEffect(() => {
-    const initialHashTimer = window.setTimeout(openComplianceFromHash, 0);
+    const initialHashTimers = [0, 350, 1100, 2200].map((delay) =>
+      window.setTimeout(openComplianceFromHash, delay),
+    );
     window.addEventListener("hashchange", openComplianceFromHash);
 
     return () => {
-      window.clearTimeout(initialHashTimer);
+      initialHashTimers.forEach(window.clearTimeout);
       window.removeEventListener("hashchange", openComplianceFromHash);
     };
   }, [openComplianceFromHash]);

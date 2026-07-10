@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { siteContent } from "@/content/site";
 import { trackCTAClick } from "@/lib/analytics";
@@ -11,6 +11,7 @@ const navLinks = siteContent.nav.links;
 export function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const update = () => setIsScrolled(window.scrollY > 20);
@@ -18,6 +19,26 @@ export function SiteHeader() {
     window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
   }, []);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      event.preventDefault();
+      setIsOpen(false);
+      window.requestAnimationFrame(() => menuButtonRef.current?.focus());
+    };
+
+    document.addEventListener("keydown", closeOnEscape);
+
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [isOpen]);
 
   return (
     <header
@@ -48,7 +69,11 @@ export function SiteHeader() {
               className="text-sm font-bold opacity-[0.86] transition hover:text-reef-coral hover:opacity-100"
               onClick={() => {
                 if (link.label === "Join Now") {
-                  trackCTAClick(link.label, "desktop-nav");
+                  trackCTAClick(
+                    link.label,
+                    "desktop-nav",
+                    "review-system-offer",
+                  );
                 }
               }}
             >
@@ -71,7 +96,11 @@ export function SiteHeader() {
                 : "bg-reef-coral text-deep-ocean-navy",
             )}
             onClick={() =>
-              trackCTAClick(siteContent.nav.buttonLabel, "desktop-header")
+              trackCTAClick(
+                siteContent.nav.buttonLabel,
+                "desktop-header",
+                "review-system-offer",
+              )
             }
           >
             {siteContent.nav.buttonLabel}
@@ -79,6 +108,7 @@ export function SiteHeader() {
         </div>
 
         <button
+          ref={menuButtonRef}
           type="button"
           className="flex size-11 items-center justify-center rounded-full border border-current/20 transition hover:border-reef-coral/70 focus-visible:outline-reef-coral lg:hidden"
           aria-expanded={isOpen}
@@ -109,7 +139,11 @@ export function SiteHeader() {
                 className="rounded-lg px-3 py-3 text-base font-extrabold hover:bg-warm-sand"
                 onClick={() => {
                   if (link.label === "Join Now") {
-                    trackCTAClick(link.label, "mobile-nav");
+                    trackCTAClick(
+                      link.label,
+                      "mobile-nav",
+                      "review-system-offer",
+                    );
                   }
 
                   setIsOpen(false);
@@ -124,7 +158,11 @@ export function SiteHeader() {
             data-cta="join-next-wave"
             className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-reef-coral px-5 text-sm font-extrabold text-deep-ocean-navy"
             onClick={() => {
-              trackCTAClick(siteContent.nav.buttonLabel, "mobile-menu");
+              trackCTAClick(
+                siteContent.nav.buttonLabel,
+                "mobile-menu",
+                "review-system-offer",
+              );
               setIsOpen(false);
             }}
           >
