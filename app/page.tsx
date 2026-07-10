@@ -4,13 +4,12 @@ import { CampaignExampleSection } from "@/components/sections/CampaignExampleSec
 import { ComplianceSection } from "@/components/sections/ComplianceSection";
 import { DiscreetClientWorkSection } from "@/components/sections/DiscreetClientWorkSection";
 import { FAQSection } from "@/components/sections/FAQSection";
-import { FinalCTASection } from "@/components/sections/FinalCTASection";
 import { GuaranteesSection } from "@/components/sections/GuaranteesSection";
 import { OneServiceSection } from "@/components/sections/OneServiceSection";
-import { PackagesSection } from "@/components/sections/PackagesSection";
 import { PhilosophySection } from "@/components/sections/PhilosophySection";
 import { ReviewCollectionGapSection } from "@/components/sections/ReviewCollectionGapSection";
 import { ReviewSystemJourneySection } from "@/components/sections/ReviewSystemJourneySection";
+import { ReviewSystemOfferSection } from "@/components/sections/ReviewSystemOfferSection";
 import { SignalTicker } from "@/components/sections/SignalTicker";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -53,12 +52,11 @@ export default function Home() {
         <PhilosophySection />
         <ComplianceSection />
         <WhyReviewsMatterSection />
-        <PackagesSection />
+        <ReviewSystemOfferSection />
         <SuitabilitySection />
         <GuaranteesSection />
         <DiscreetClientWorkSection />
         <FAQSection />
-        <FinalCTASection />
       </main>
       <SiteFooter />
     </>
