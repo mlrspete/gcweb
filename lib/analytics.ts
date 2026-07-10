@@ -8,8 +8,6 @@ import type {
 
 type AnalyticsEventName =
   | "cta_click"
-  | "form_submit"
-  | "package_select"
   | "fit_check_opened"
   | "fit_check_started"
   | "fit_check_completed"
@@ -64,18 +62,6 @@ export function trackCTAClick(label: string, location: string) {
   emitAnalyticsEvent("cta_click", {
     label,
     location,
-  });
-}
-
-export function trackFormSubmit(status: string) {
-  emitAnalyticsEvent("form_submit", {
-    status,
-  });
-}
-
-export function trackPackageSelect(packageName: string) {
-  emitAnalyticsEvent("package_select", {
-    packageName,
   });
 }
 

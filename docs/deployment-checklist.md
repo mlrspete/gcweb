@@ -1,19 +1,20 @@
 # Deployment Checklist
 
-## Install And Build
+## Install And Validate
 
 - Install dependencies with `npm install`.
 - Run `npm run format`.
 - Run `npm run typecheck`.
 - Run `npm run lint`.
+- Run `npm run check:frozen`.
+- Run `npm run check:pivot-content`.
+- Run `npm run check:pivot`.
 - Run `npm run build`.
 
 ## Vercel Environment
 
 - Add all production environment variables from `docs/env-checklist.md`.
-- Set `NEXT_PUBLIC_SITE_URL` to `https://grubclub.gg`.
-- Configure `grubclub.gg` and `www.grubclub.gg` in Vercel.
-- Follow `docs/vercel-migration.md` for the GitHub Pages to Vercel cutover.
+- Set `NEXT_PUBLIC_SITE_URL` to the production origin.
 - Redeploy production after changing `NEXT_PUBLIC_SITE_URL`.
 - Confirm the project uses the intended Node.js/runtime defaults for Next.js.
 
@@ -21,42 +22,39 @@
 
 - Verify `LEAD_FROM_EMAIL` with the provider.
 - Confirm `LEAD_TO_EMAIL` is the correct recipient inbox.
-- Submit a test lead from the deployed site.
-- Confirm the email includes the selected package, timestamp, source page, and compliance checkbox value.
+- Submit a controlled test application from the deployed site.
+- Confirm the email subject is `New Growth Specialists review system application`.
+- Confirm the email includes fit-check answers, result categories, contact details, timestamp, source page and compliance confirmation.
+- Confirm honeypot submissions return success and send no email.
 
-## Stripe
+## Domain, SEO And Indexing
 
-- Confirm Stripe starts in test mode.
-- Confirm `STRIPE_FOUNDATION_PRICE_ID` maps to Foundation Wave at `$299`.
-- Confirm `STRIPE_MOMENTUM_PRICE_ID` maps to Momentum Wave at `$500`.
-- Test package selection and checkout session creation.
-- Switch to live keys and live price IDs only after test checkout succeeds.
-
-## Domain, SEO, And Indexing
-
+- Check `/`.
+- Check `/privacy`.
+- Check `/terms`.
+- Check `/satisfaction-guarantee`.
 - Check `/sitemap.xml`.
 - Check `/robots.txt`.
 - Confirm canonical metadata uses the production domain.
 - Confirm Open Graph image resolves at `/og-growth-specialists.png`.
 - Confirm favicon and app icon resolve.
-- Check page title and description in the browser or deployed HTML.
-- Check `/api/health` on the Vercel deployment.
+- Check `/api/health` on the Vercel deployment if the route is retained.
+- Confirm `/api/checkout` returns 404.
 
 ## Manual QA
 
 - Check mobile at 360px and 390px.
 - Check tablet at 768px.
-- Check laptop and desktop at 1024px, 1440px, and a large desktop width.
+- Check laptop and desktop at 1024px, 1440px and 1920px.
 - Check reduced-motion mode.
-- Check keyboard navigation through nav, CTAs, FAQ accordion, and form.
-- Check Chrome, Safari, Firefox, and iOS Safari before launch.
+- Check keyboard navigation through nav, CTAs, fit-check dialog and FAQ accordion.
+- Check Chrome, Safari, Firefox and iOS Safari before launch.
 - Confirm mobile navigation opens and closes cleanly.
-- Confirm pricing CTAs preselect the correct package in the join form.
-- Confirm form success and error states are announced and visible.
+- Confirm the fit-check Stage One has no name, email or phone fields.
+- Confirm the Compliance nav opens FAQ 05.
 
-## Placeholder Replacement
+## Launch Gate
 
-- Replace placeholder Privacy, Terms, and Refund Policy links.
-- Replace placeholder brand assets if final assets are supplied.
-- Replace placeholder review-style cards only with approved client quotes.
-- Confirm no fake clients, awards, ratings, or review schema are added.
+- Do not accept payment invitations until Australian legal review is complete.
+- Do not add a public checkout route.
+- Do not add rating schema, fake testimonials or promised review outcomes.

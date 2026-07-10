@@ -7,10 +7,10 @@ export const siteContent = {
   wordmark: "growthspecialists",
   ...(configuredContactEmail ? { contactEmail: configuredContactEmail } : {}),
   metadata: {
-    title: "Growth Specialists | Local Visibility Campaigns",
+    title: "Growth Specialists | Custom Google Review Collection Systems",
     titleTemplate: "%s | Growth Specialists",
     description:
-      "Compliance-first local visibility campaigns that help suitable small businesses create genuine local experiences, collect honest feedback and build the visibility layer customers look for when they search.",
+      "Tailored Google review collection systems for small businesses, built around genuine customers, existing tools and compliant requests for honest feedback.",
     siteName: "Growth Specialists",
     ogImagePath: "/og-growth-specialists.png",
     twitterCard: "summary_large_image",
@@ -29,20 +29,7 @@ export const siteContent = {
     microcopy:
       "No quote call. No long consultation. Just a clean campaign slot.",
   },
-  foundationStatus: {
-    summary:
-      "Ocean/coral design system loaded, structured landing page content ready, and the temporary App Router page is server-rendered to avoid hydration drift.",
-    confirmations: [
-      "Growth Specialists",
-      "Ocean/coral design system loaded",
-      "Structured content architecture ready",
-    ],
-    complianceLine:
-      "Foundation copy stays aligned to genuine local experiences, honest feedback, eligible review opportunities, and non-incentivised review requests.",
-  },
 } satisfies SiteContent;
-
-export const foundationStatusContent = siteContent.foundationStatus;
 
 export function getSiteUrl() {
   const explicitSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();

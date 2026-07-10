@@ -68,5 +68,14 @@ jobs:
       - name: Lint
         run: ${{ steps.detect-package-manager.outputs.runner }} eslint . --max-warnings=0
 
+      - name: Frozen copy check
+        run: ${{ steps.detect-package-manager.outputs.manager }} run check:frozen
+
+      - name: Pivot content check
+        run: ${{ steps.detect-package-manager.outputs.manager }} run check:pivot-content
+
+      - name: Pivot invariant check
+        run: ${{ steps.detect-package-manager.outputs.manager }} run check:pivot
+
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
