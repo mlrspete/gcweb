@@ -28,7 +28,15 @@ function GapStatistic({
         {body}
       </p>
       <p className="mt-4 text-sm font-extrabold uppercase tracking-normal text-deep-ocean-navy/58">
-        Source: {sourceLabel}
+        Source:{" "}
+        <a
+          href={content.sources.brightLocal.url}
+          target="_blank"
+          rel="noreferrer"
+          className="underline decoration-deep-ocean-navy/20 underline-offset-4 transition hover:text-reef-coral focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-reef-coral"
+        >
+          {sourceLabel}
+        </a>
       </p>
     </article>
   );
@@ -132,7 +140,18 @@ export function ReviewCollectionGapSection() {
           </div>
 
           <p className="mt-4 rounded-lg border border-deep-ocean-navy/10 bg-pearl-white/70 p-4 text-sm font-semibold leading-6 text-abyss-blue/76">
-            {content.sourceNote}
+            Source:{" "}
+            <a
+              href={content.sources.brightLocal.url}
+              target="_blank"
+              rel="noreferrer"
+              className="font-extrabold text-deep-ocean-navy underline decoration-deep-ocean-navy/20 underline-offset-4 transition hover:text-reef-coral focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-reef-coral"
+            >
+              {content.sources.brightLocal.label}
+            </a>
+            {content.sourceNote.slice(
+              `Source: ${content.sources.brightLocal.label}`.length,
+            )}
           </p>
 
           <p

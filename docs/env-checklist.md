@@ -1,33 +1,42 @@
 # Environment Checklist
 
-Use this checklist when configuring Vercel or any production-like environment.
+Use this checklist for every Vercel preview and production-like environment.
 
-## Required
+## Required In Production
 
 - `NEXT_PUBLIC_SITE_URL`
-  - Production site origin.
-  - Used for canonical URLs, sitemap, metadata and application source context.
+  - Set to the public site origin with no path.
+  - Supplies canonical URLs, Open Graph URLs, sitemap entries and application
+    source context.
 - `LEAD_TO_EMAIL`
-  - Inbox that receives Growth Specialists review-system applications.
+  - Inbox that receives review-system applications.
 - `LEAD_FROM_EMAIL`
-  - Verified sender address from the email provider.
+  - Sender address verified with Resend.
 - `RESEND_API_KEY` or `EMAIL_PROVIDER_API_KEY`
-  - Server-only email provider key.
-  - `RESEND_API_KEY` is preferred by the current adapter.
+  - Server-only Resend credential.
+  - `EMAIL_PROVIDER_API_KEY` is a fallback variable name for the same current
+    adapter, not a separate provider integration.
 
 ## Optional
 
 - `NEXT_PUBLIC_CONTACT_EMAIL`
-  - Visible contact address for policy pages. If absent, the Privacy page instructs users to reply to application correspondence.
-- `NEXT_PUBLIC_GA_MEASUREMENT_ID`
-  - Optional if a supported analytics script is installed separately.
-- `NEXT_PUBLIC_GTM_ID`
-  - Optional if a supported tag-manager script is installed separately.
+  - Visible contact address on policy pages.
+  - When absent, the Privacy page directs applicants to reply to application
+    correspondence.
 
-## Notes
+## Analytics
 
-- There is no public checkout route and no Stripe dependency.
-- Accepted applicants receive any payment invitation outside the public landing-page flow.
-- Keep secret keys out of client-side code.
-- Do not commit `.env.local`.
-- In development, missing email provider settings return a development-mode success and log only non-sensitive categories.
+No analytics environment variable is currently consumed. The site does not
+load GA or GTM scripts. `lib/analytics.ts` is no-op-safe when neither a runtime
+`dataLayer` nor `gtag` exists and must remain free of personal information.
+
+## Configuration Safety
+
+- Keep API keys server-only and out of logs, screenshots and browser bundles.
+- Do not commit `.env.local` or production values.
+- There is no public payment integration. Accepted applicants receive any
+  payment invitation outside the landing-page flow.
+- Missing email settings return a non-sensitive development-mode success only
+  when `NODE_ENV` is not `production`.
+
+The committed `.env.example` is the canonical variable-name reference.

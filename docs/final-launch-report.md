@@ -4,35 +4,54 @@ Date: 2026-07-10
 
 ## Current Release State
 
-The repository now represents the Custom Review Capture System pivot outside the frozen header, hero and signal ticker. The final production release is still gated by deployment verification, live email testing and Australian legal review.
+The repository represents the one-off Custom Review Capture System across the
+public page, policy pages, metadata, schema, analytics contract and operational
+documentation. Production release remains gated by browser hardening, live
+email verification and Australian legal review.
 
 ## Completed Code-Level Work
 
-- Final root page architecture:
-  1. Hero
-  2. Signal ticker
-  3. Review Collection Gap
-  4. How the Program Works
-  5. $299 Custom Review Capture System
-  6. FAQ
-- Footer renders the new product positioning and real policy routes.
-- Privacy, Terms and Satisfaction Guarantee pages resolve.
-- Fit-check application flow uses client and server validation, honeypot handling, email-provider abstraction and PII-restricted analytics.
-- Public checkout code has been removed.
-- Stripe dependency and Stripe environment variables have been removed.
+- Final root order: hero, signal ticker, review gap, journey, `$299 AUD` offer,
+  FAQ and footer.
+- Privacy, Terms and Satisfaction Guarantee pages resolve with unique titles and
+  environment-derived canonical URLs.
+- Search, Open Graph and Twitter metadata describe the current service.
+- The `1200x630` social card uses current brand colours and review-system copy.
+- Conservative service JSON-LD describes a one-off setup and contains no review
+  or rating claims.
+- Sitemap contains only the four public pages; preview robots block indexing and
+  production robots exclude internal API routes.
+- Fit-check delivery uses client/server validation, honeypot handling, a Resend
+  adapter and PII-restricted analytics.
+- The public site contains no payment flow.
+- Analytics names, properties, funnel order and prohibited PII are documented in
+  `docs/analytics-events.md`.
+- Obsolete domain-migration instructions and unsupported analytics variables
+  have been removed.
+
+## Source Verification
+
+On 2026-07-10, the visible references were checked against:
+
+- BrightLocal Local Consumer Review Survey 2026
+- Google Business Profile Help local-ranking guidance
+- Google Maps User Generated Content contribution policy
+
+No additional claims were added from those sources.
 
 ## Required Before Production Payment Invitations
 
+- Complete Milestone 8 responsive, accessibility and performance hardening.
 - Verify a Vercel preview end to end.
-- Confirm production email environment variables are configured without exposing secret values.
-- Submit a controlled test application and confirm the email arrives.
+- Submit a controlled application and confirm live email delivery.
 - Confirm honeypot submissions send no email.
-- Confirm analytics payloads contain no URLs, emails, names, business names, notes or raw form data.
-- Obtain Australian legal review of payment/refund terms and public compliance claims.
-- Reverify statistical sources before launch.
+- Confirm analytics payloads contain no personal information.
+- Obtain Australian legal review of payment/refund terms and public compliance
+  claims.
 
-## Remaining Non-Code Actions
+## Ongoing Operations
 
-- Replace final brand assets if approved assets are supplied.
-- Review the Open Graph image during the metadata milestone.
+- Recheck source currency if launch is materially delayed.
 - Monitor email delivery after launch.
+- Replace placeholder favicon/mark assets only when approved identity files are
+  supplied; the current files contain no obsolete product wording.

@@ -1,19 +1,23 @@
 # Growth Specialists
 
-Next.js landing page for the Growth Specialists Custom Review Capture System.
+Next.js website for the Growth Specialists Custom Review Capture System: a
+one-off `$299 AUD` workflow audit, system design, implementation and handoff for
+suitable small businesses.
 
-The public page keeps the frozen header, hero and signal ticker intact, then presents one offer: a `$299 AUD` one-off review-request system setup for suitable small businesses. The public site does not include checkout. Applicants submit a fit-check application and receive any payment invitation separately after manual review.
+The public flow does not take payment. A visitor completes an anonymous
+first-stage fit check, sees a preliminary result, and can then choose to submit
+contact details for manual review. There is no public Stripe integration;
+accepted applicants receive any payment invitation separately.
 
-## Tech Stack
+## Stack
 
-- Next.js App Router
-- TypeScript with strict checking
+- Next.js App Router, React and strict TypeScript
 - Tailwind CSS
 - GSAP for reveal and journey motion
 - React Three Fiber and Three.js for the frozen desktop hero scene
 - Radix Accordion and Dialog
 - React Hook Form, Zod and `@hookform/resolvers`
-- Email provider abstraction with a Resend adapter
+- Server Actions and a Resend-backed email adapter
 
 ## Local Setup
 
@@ -23,43 +27,62 @@ cp .env.example .env.local
 npm run dev
 ```
 
+Open `http://localhost:3000`. In local development, a valid application returns
+a development success when email settings are absent; the server logs only
+non-sensitive categories.
+
 ## Scripts
 
-```bash
-npm run format
-npm run typecheck
-npm run lint
-npm run check:frozen
-npm run check:pivot-content
-npm run check:pivot
-npm run build
-npm run start
-```
+| Command                       | Purpose                                     |
+| ----------------------------- | ------------------------------------------- |
+| `npm run dev`                 | Start the local development server          |
+| `npm run format`              | Check Prettier formatting                   |
+| `npm run format:write`        | Apply Prettier formatting                   |
+| `npm run typecheck`           | Run TypeScript without emitting files       |
+| `npm run lint`                | Run ESLint with zero warnings allowed       |
+| `npm run check:frozen`        | Protect frozen header, hero and ticker copy |
+| `npm run check:pivot-content` | Validate the canonical pivot content        |
+| `npm run check:pivot`         | Validate final architecture and invariants  |
+| `npm run build`               | Create a production Next.js build           |
+| `npm run start`               | Serve the production build                  |
 
-## Environment Variables
+## Environment
 
-Required for production application delivery:
+Production application delivery requires:
 
-- `NEXT_PUBLIC_SITE_URL`
-- `LEAD_TO_EMAIL`
-- `LEAD_FROM_EMAIL`
-- `RESEND_API_KEY` or `EMAIL_PROVIDER_API_KEY`
+- `NEXT_PUBLIC_SITE_URL`: public origin used for canonical URLs and sitemap
+- `LEAD_TO_EMAIL`: recipient inbox for applications
+- `LEAD_FROM_EMAIL`: verified sender address
+- `RESEND_API_KEY` or `EMAIL_PROVIDER_API_KEY`: server-only Resend credential
 
-Optional:
+`NEXT_PUBLIC_CONTACT_EMAIL` is optional and appears on policy pages when set.
+The application does not currently load GA or GTM scripts and supports no
+analytics ID environment variables. Its adapter safely forwards events only
+when a runtime `dataLayer` or `gtag` already exists.
 
-- `NEXT_PUBLIC_CONTACT_EMAIL`
-- `NEXT_PUBLIC_GA_MEASUREMENT_ID`
-- `NEXT_PUBLIC_GTM_ID`
+## Privacy And Analytics
 
-## Product Notes
+Stage One remains in the browser and asks for no name, phone number or email.
+Its answers reach the server only when the visitor submits Stage Two. Analytics
+may contain fixed categories and boolean tool-presence flags, but never URLs,
+email addresses, names, business names, notes, arbitrary text or raw form
+objects. The full contract is in `docs/analytics-events.md`.
 
-- The first fit-check stage stays client-side and requests no name, phone number or email.
-- Application email is sent only after the user chooses to submit contact details in Stage Two.
-- Analytics events must not include URLs, email addresses, contact names, business names, notes or raw form objects.
-- The frozen header, hero and signal ticker copy are protected by `npm run check:frozen`.
-- Pivot content counts and constraints are protected by `npm run check:pivot-content`.
-- Final architecture and no-checkout invariants are protected by `npm run check:pivot`.
+## Deployment
 
-## Legal Gate
+1. Configure the variables in `docs/env-checklist.md` for the preview and
+   production environments.
+2. Run every validation command in `docs/deployment-checklist.md`.
+3. Deploy a preview, confirm it is not indexable, and submit a controlled email
+   test without real customer information.
+4. Verify canonical, social, schema, sitemap, robots and policy routes against
+   the intended production origin.
+5. Promote only after the legal and release gates are complete.
 
-Privacy, Terms and Satisfaction Guarantee pages are present, but payment/refund wording and public compliance claims still require Australian legal review before accepting payment invitations.
+## Release Gates
+
+The header, hero and signal ticker are intentionally frozen and protected by
+`npm run check:frozen`; only approved anchor destinations may differ. Privacy,
+Terms and Satisfaction Guarantee pages are present, but Australian legal review
+of payment/refund wording and public compliance claims is required before
+accepting payment invitations.

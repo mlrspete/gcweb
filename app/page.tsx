@@ -15,8 +15,7 @@ const professionalServiceSchema = {
   "@id": `${getCanonicalUrl()}#professional-service`,
   name: siteContent.displayName,
   url: getCanonicalUrl(),
-  description:
-    "Tailored Google review collection systems for small businesses, built around genuine customers, existing tools and compliant requests for honest feedback.",
+  description: siteContent.metadata.description,
   serviceType: "Custom Google Review Collection System Setup",
   makesOffer: {
     "@type": "Offer",

@@ -11,50 +11,59 @@
 - Run `npm run check:pivot`.
 - Run `npm run build`.
 
-## Vercel Environment
+## Environment And Preview
 
-- Add all production environment variables from `docs/env-checklist.md`.
-- Set `NEXT_PUBLIC_SITE_URL` to the production origin.
-- Redeploy production after changing `NEXT_PUBLIC_SITE_URL`.
-- Confirm the project uses the intended Node.js/runtime defaults for Next.js.
+- Configure the variables in `docs/env-checklist.md` without exposing values.
+- Set `NEXT_PUBLIC_SITE_URL` to the intended origin and redeploy after changing
+  it.
+- Confirm preview deployments return a disallow-all robots policy.
+- Confirm the production deployment allows public pages and disallows `/api/`.
 
 ## Email Provider
 
-- Verify `LEAD_FROM_EMAIL` with the provider.
-- Confirm `LEAD_TO_EMAIL` is the correct recipient inbox.
-- Submit a controlled test application from the deployed site.
-- Confirm the email subject is `New Growth Specialists review system application`.
-- Confirm the email includes fit-check answers, result categories, contact details, timestamp, source page and compliance confirmation.
+- Verify `LEAD_FROM_EMAIL` with Resend.
+- Confirm `LEAD_TO_EMAIL` is the intended recipient inbox.
+- Submit a controlled test application with synthetic contact data.
+- Confirm the subject is `New Growth Specialists review system application`.
+- Confirm the message includes fit-check answers, result categories, contact
+  details, timestamp, source page and compliance confirmation.
 - Confirm honeypot submissions return success and send no email.
 
-## Domain, SEO And Indexing
+## Metadata And Indexing
 
-- Check `/`.
-- Check `/privacy`.
-- Check `/terms`.
-- Check `/satisfaction-guarantee`.
-- Check `/sitemap.xml`.
-- Check `/robots.txt`.
-- Confirm canonical metadata uses the production domain.
-- Confirm Open Graph image resolves at `/og-growth-specialists.png`.
-- Confirm favicon and app icon resolve.
-- Check `/api/health` on the Vercel deployment if the route is retained.
-- Confirm `/api/checkout` returns 404.
+- Check `/`, `/privacy`, `/terms` and `/satisfaction-guarantee`.
+- Check `/sitemap.xml` contains exactly those four public routes.
+- Check `/robots.txt` uses the environment-derived sitemap URL.
+- Confirm the root title, title template, canonical, description, Open Graph and
+  Twitter values match `content/site.ts`.
+- Confirm policy pages have unique titles and canonicals.
+- Confirm `/og-growth-specialists.png` is a legible `1200x630` image.
+- Validate the root JSON-LD serialization and the `$299 AUD` service offer.
+- Confirm JSON-LD contains no ratings, reviews, counts, address, phone, awards or
+  promised outcomes.
+- Open the BrightLocal, Google ranking guidance and Google contribution policy
+  links from the rendered page.
+
+## Analytics And Privacy
+
+- Inspect the event sequence against `docs/analytics-events.md`.
+- Confirm fixed CTA labels use `destination` values for the review-system offer
+  or journey.
+- Confirm payloads contain no URL, email, contact name, business name, notes,
+  arbitrary text or raw form object.
+- Confirm the page works without GA, GTM or any analytics environment variable.
 
 ## Manual QA
 
-- Check mobile at 360px and 390px.
-- Check tablet at 768px.
-- Check laptop and desktop at 1024px, 1440px and 1920px.
-- Check reduced-motion mode.
-- Check keyboard navigation through nav, CTAs, fit-check dialog and FAQ accordion.
+- Check one H1 and a logical heading order.
+- Check 360px, 390px, 768px, 1024px, 1440px and 1920px viewports.
+- Check reduced-motion mode and keyboard navigation.
+- Check the nav, fit-check dialog, FAQ accordion and Compliance hash link.
 - Check Chrome, Safari, Firefox and iOS Safari before launch.
-- Confirm mobile navigation opens and closes cleanly.
-- Confirm the fit-check Stage One has no name, email or phone fields.
-- Confirm the Compliance nav opens FAQ 05.
+- Confirm Stage One has no name, email or phone fields.
 
 ## Launch Gate
 
-- Do not accept payment invitations until Australian legal review is complete.
-- Do not add a public checkout route.
+- Complete Australian legal review before accepting payment invitations.
+- Complete live email, accessibility, performance and cross-browser checks.
 - Do not add rating schema, fake testimonials or promised review outcomes.

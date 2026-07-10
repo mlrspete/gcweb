@@ -48,7 +48,11 @@ export function SiteHeader() {
               className="text-sm font-bold opacity-[0.86] transition hover:text-reef-coral hover:opacity-100"
               onClick={() => {
                 if (link.label === "Join Now") {
-                  trackCTAClick(link.label, "desktop-nav");
+                  trackCTAClick(
+                    link.label,
+                    "desktop-nav",
+                    "review-system-offer",
+                  );
                 }
               }}
             >
@@ -71,7 +75,11 @@ export function SiteHeader() {
                 : "bg-reef-coral text-deep-ocean-navy",
             )}
             onClick={() =>
-              trackCTAClick(siteContent.nav.buttonLabel, "desktop-header")
+              trackCTAClick(
+                siteContent.nav.buttonLabel,
+                "desktop-header",
+                "review-system-offer",
+              )
             }
           >
             {siteContent.nav.buttonLabel}
@@ -109,7 +117,11 @@ export function SiteHeader() {
                 className="rounded-lg px-3 py-3 text-base font-extrabold hover:bg-warm-sand"
                 onClick={() => {
                   if (link.label === "Join Now") {
-                    trackCTAClick(link.label, "mobile-nav");
+                    trackCTAClick(
+                      link.label,
+                      "mobile-nav",
+                      "review-system-offer",
+                    );
                   }
 
                   setIsOpen(false);
@@ -124,7 +136,11 @@ export function SiteHeader() {
             data-cta="join-next-wave"
             className="mt-4 inline-flex min-h-12 w-full items-center justify-center rounded-full bg-reef-coral px-5 text-sm font-extrabold text-deep-ocean-navy"
             onClick={() => {
-              trackCTAClick(siteContent.nav.buttonLabel, "mobile-menu");
+              trackCTAClick(
+                siteContent.nav.buttonLabel,
+                "mobile-menu",
+                "review-system-offer",
+              );
               setIsOpen(false);
             }}
           >

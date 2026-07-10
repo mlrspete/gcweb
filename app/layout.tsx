@@ -24,8 +24,8 @@ export const metadata: Metadata = {
     canonical: getCanonicalUrl(),
   },
   openGraph: {
-    title: siteContent.metadata.title,
-    description: siteContent.metadata.description,
+    title: siteContent.metadata.openGraphTitle,
+    description: siteContent.metadata.openGraphDescription,
     siteName: siteContent.metadata.siteName,
     type: "website",
     url: getCanonicalUrl(),
@@ -34,14 +34,14 @@ export const metadata: Metadata = {
         url: siteContent.metadata.ogImagePath,
         width: 1200,
         height: 630,
-        alt: "Growth Specialists ocean and coral brand mark",
+        alt: siteContent.metadata.ogImageAlt,
       },
     ],
   },
   twitter: {
     card: siteContent.metadata.twitterCard,
-    title: siteContent.metadata.title,
-    description: siteContent.metadata.description,
+    title: siteContent.metadata.openGraphTitle,
+    description: siteContent.metadata.openGraphDescription,
     images: [siteContent.metadata.ogImagePath],
   },
   icons: {
