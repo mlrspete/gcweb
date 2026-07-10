@@ -331,6 +331,30 @@ select {
     display: none;
   }
 
+  .review-journey-panel {
+    contain: paint;
+  }
+
+  .review-journey-phase {
+    min-width: 0;
+  }
+
+  .review-journey-customer-card,
+  .review-journey-work-module {
+    will-change: opacity, transform;
+  }
+
+  html[data-motion="reduced"] [data-journey-fish] {
+    display: none !important;
+  }
+
+  html[data-motion="reduced"] [data-customer-step],
+  html[data-motion="reduced"] [data-work-module],
+  html[data-motion="reduced"] [data-journey-current] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
   html[data-motion="reduced"] .gsap-reveal,
   html[data-motion="reduced"] .gsap-split-word,
   html[data-motion="reduced"] .gsap-parallax-float {

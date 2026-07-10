@@ -6,11 +6,11 @@ import { DiscreetClientWorkSection } from "@/components/sections/DiscreetClientW
 import { FAQSection } from "@/components/sections/FAQSection";
 import { FinalCTASection } from "@/components/sections/FinalCTASection";
 import { GuaranteesSection } from "@/components/sections/GuaranteesSection";
-import { HowItWorksSection } from "@/components/sections/HowItWorksSection";
 import { OneServiceSection } from "@/components/sections/OneServiceSection";
 import { PackagesSection } from "@/components/sections/PackagesSection";
 import { PhilosophySection } from "@/components/sections/PhilosophySection";
 import { ReviewCollectionGapSection } from "@/components/sections/ReviewCollectionGapSection";
+import { ReviewSystemJourneySection } from "@/components/sections/ReviewSystemJourneySection";
 import { SignalTicker } from "@/components/sections/SignalTicker";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -47,7 +47,7 @@ export default function Home() {
         <HeroSection />
         <SignalTicker />
         <ReviewCollectionGapSection />
-        <HowItWorksSection />
+        <ReviewSystemJourneySection />
         <OneServiceSection />
         <CampaignExampleSection />
         <PhilosophySection />
