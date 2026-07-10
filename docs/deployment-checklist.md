@@ -11,8 +11,10 @@
 ## Vercel Environment
 
 - Add all production environment variables from `docs/env-checklist.md`.
-- Set `NEXT_PUBLIC_SITE_URL` to the final domain origin.
-- Configure the production domain in Vercel.
+- Set `NEXT_PUBLIC_SITE_URL` to `https://grubclub.gg`.
+- Configure `grubclub.gg` and `www.grubclub.gg` in Vercel.
+- Follow `docs/vercel-migration.md` for the GitHub Pages to Vercel cutover.
+- Redeploy production after changing `NEXT_PUBLIC_SITE_URL`.
 - Confirm the project uses the intended Node.js/runtime defaults for Next.js.
 
 ## Email Provider
@@ -38,6 +40,7 @@
 - Confirm Open Graph image resolves at `/og-growth-specialists.png`.
 - Confirm favicon and app icon resolve.
 - Check page title and description in the browser or deployed HTML.
+- Check `/api/health` on the Vercel deployment.
 
 ## Manual QA
 

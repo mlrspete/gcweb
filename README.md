@@ -67,7 +67,9 @@ See `docs/env-checklist.md` for deployment notes.
 
 - Deploy to Vercel as a Next.js App Router project.
 - Add environment variables in Vercel before testing the join form.
-- Configure the production domain and set `NEXT_PUBLIC_SITE_URL` to that origin.
+- Configure `grubclub.gg` and `www.grubclub.gg` in Vercel and set `NEXT_PUBLIC_SITE_URL=https://grubclub.gg`.
+- Use `docs/vercel-migration.md` when moving DNS away from GitHub Pages.
+- The current production Vercel URL is `https://gcweb-opal.vercel.app`.
 - Confirm email delivery with a real test enquiry.
 - Confirm Stripe in test mode before switching to live keys and live price IDs.
 - Check `/sitemap.xml`, `/robots.txt`, metadata, Open Graph image, favicon, mobile layout, and reduced-motion mode.
