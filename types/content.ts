@@ -25,6 +25,7 @@ export type NavLink = {
 export type SiteContent = {
   displayName: string;
   wordmark: string;
+  contactEmail?: string;
   metadata: {
     title: string;
     titleTemplate: string;

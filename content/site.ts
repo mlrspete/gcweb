@@ -1,8 +1,11 @@
 import type { SiteContent } from "@/types/content";
 
+const configuredContactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim();
+
 export const siteContent = {
   displayName: "Growth Specialists",
   wordmark: "growthspecialists",
+  ...(configuredContactEmail ? { contactEmail: configuredContactEmail } : {}),
   metadata: {
     title: "Growth Specialists | Local Visibility Campaigns",
     titleTemplate: "%s | Growth Specialists",
@@ -17,10 +20,10 @@ export const siteContent = {
     logoLabel: "growthspecialists",
     links: [
       { label: "How it works", href: "#how-it-works" },
-      { label: "Compliance", href: "#compliance" },
-      { label: "Pricing", href: "#packages" },
+      { label: "Compliance", href: "#faq-compliance" },
+      { label: "Pricing", href: "#pricing" },
       { label: "FAQ", href: "#faq" },
-      { label: "Join Now", href: "#join-now" },
+      { label: "Join Now", href: "#pricing" },
     ],
     buttonLabel: "Join the next wave",
     microcopy:

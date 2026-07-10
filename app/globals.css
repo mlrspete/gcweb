@@ -257,6 +257,14 @@ select {
     font-variant-numeric: tabular-nums;
   }
 
+  .accordion-content[data-state="open"] {
+    animation: accordion-content-down 240ms ease-out;
+  }
+
+  .accordion-content[data-state="closed"] {
+    animation: accordion-content-up 200ms ease-out;
+  }
+
   .gsap-ticker {
     width: 100%;
   }
@@ -375,6 +383,30 @@ select {
   }
 }
 
+@keyframes accordion-content-down {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+
+  to {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes accordion-content-up {
+  from {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
 @keyframes bubble-rise {
   0% {
     transform: translate3d(0, 18px, 0) scale(0.96);
@@ -449,6 +481,11 @@ select {
   .section-reveal {
     opacity: 1;
     transform: none;
+  }
+
+  .accordion-content[data-state="open"],
+  .accordion-content[data-state="closed"] {
+    animation: none;
   }
 
   .motion-reduce-hide {
