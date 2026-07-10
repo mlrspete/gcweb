@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier . --check",
     "format:write": "prettier . --write",
-    "check:frozen": "node scripts/check-frozen-copy.mjs"
+    "check:frozen": "node scripts/check-frozen-copy.mjs",
+    "check:pivot-content": "node scripts/check-pivot-content.mjs"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.2.8",
