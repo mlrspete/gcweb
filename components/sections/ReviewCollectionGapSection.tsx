@@ -33,6 +33,7 @@ function GapStatistic({
           href={content.sources.brightLocal.url}
           target="_blank"
           rel="noreferrer"
+          aria-label={`${sourceLabel} (opens in a new tab)`}
           className="underline decoration-deep-ocean-navy/20 underline-offset-4 transition hover:text-reef-coral focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-reef-coral"
         >
           {sourceLabel}
@@ -145,6 +146,7 @@ export function ReviewCollectionGapSection() {
               href={content.sources.brightLocal.url}
               target="_blank"
               rel="noreferrer"
+              aria-label={`${content.sources.brightLocal.label} (opens in a new tab)`}
               className="font-extrabold text-deep-ocean-navy underline decoration-deep-ocean-navy/20 underline-offset-4 transition hover:text-reef-coral focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-reef-coral"
             >
               {content.sources.brightLocal.label}
