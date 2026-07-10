@@ -7,7 +7,7 @@ import { useGSAPContext } from "@/hooks/useGSAPContext";
 import { cn } from "@/lib/utils";
 
 export type TickerProps = HTMLAttributes<HTMLDivElement> & {
-  items: string[];
+  items: readonly string[];
   duration?: number;
   pauseOnHover?: boolean;
   showFishIcon?: boolean;

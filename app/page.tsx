@@ -1,21 +1,12 @@
-import { JsonLd } from "@/components/seo/JsonLd";
-import { HeroSection } from "@/components/sections/HeroSection";
-import { CampaignExampleSection } from "@/components/sections/CampaignExampleSection";
-import { ComplianceSection } from "@/components/sections/ComplianceSection";
-import { DiscreetClientWorkSection } from "@/components/sections/DiscreetClientWorkSection";
-import { FAQSection } from "@/components/sections/FAQSection";
-import { FinalCTASection } from "@/components/sections/FinalCTASection";
-import { GuaranteesSection } from "@/components/sections/GuaranteesSection";
-import { HowItWorksSection } from "@/components/sections/HowItWorksSection";
-import { OneServiceSection } from "@/components/sections/OneServiceSection";
-import { PackagesSection } from "@/components/sections/PackagesSection";
-import { PhilosophySection } from "@/components/sections/PhilosophySection";
-import { SignalTicker } from "@/components/sections/SignalTicker";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
-import { SuitabilitySection } from "@/components/sections/SuitabilitySection";
-import { VisibilityGapSection } from "@/components/sections/VisibilityGapSection";
-import { WhyReviewsMatterSection } from "@/components/sections/WhyReviewsMatterSection";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { FAQSection } from "@/components/sections/FAQSection";
+import { HeroSection } from "@/components/sections/HeroSection";
+import { ReviewCollectionGapSection } from "@/components/sections/ReviewCollectionGapSection";
+import { ReviewSystemJourneySection } from "@/components/sections/ReviewSystemJourneySection";
+import { ReviewSystemOfferSection } from "@/components/sections/ReviewSystemOfferSection";
+import { SignalTicker } from "@/components/sections/SignalTicker";
 import { getCanonicalUrl, siteContent } from "@/content/site";
 
 const professionalServiceSchema = {
@@ -24,16 +15,18 @@ const professionalServiceSchema = {
   "@id": `${getCanonicalUrl()}#professional-service`,
   name: siteContent.displayName,
   url: getCanonicalUrl(),
-  description: siteContent.metadata.description,
-  serviceType: "Local visibility campaigns",
-  areaServed: "Local service areas",
+  description:
+    "Tailored Google review collection systems for small businesses, built around genuine customers, existing tools and compliant requests for honest feedback.",
+  serviceType: "Custom Google Review Collection System Setup",
   makesOffer: {
     "@type": "Offer",
+    price: "299",
+    priceCurrency: "AUD",
     itemOffered: {
       "@type": "Service",
-      name: "Local visibility campaigns",
+      name: "Custom Google Review Collection System Setup",
       description:
-        "Compliance-first campaigns built around genuine local experiences, honest feedback and customer visibility signals.",
+        "A one-off workflow audit, review-request system design, digital asset build, standard implementation and handoff for suitable small businesses.",
     },
   },
 };
@@ -46,19 +39,10 @@ export default function Home() {
       <main>
         <HeroSection />
         <SignalTicker />
-        <VisibilityGapSection />
-        <HowItWorksSection />
-        <OneServiceSection />
-        <CampaignExampleSection />
-        <PhilosophySection />
-        <ComplianceSection />
-        <WhyReviewsMatterSection />
-        <PackagesSection />
-        <SuitabilitySection />
-        <GuaranteesSection />
-        <DiscreetClientWorkSection />
+        <ReviewCollectionGapSection />
+        <ReviewSystemJourneySection />
+        <ReviewSystemOfferSection />
         <FAQSection />
-        <FinalCTASection />
       </main>
       <SiteFooter />
     </>

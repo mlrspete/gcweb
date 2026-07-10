@@ -9,7 +9,10 @@
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "format": "prettier . --check",
-    "format:write": "prettier . --write"
+    "format:write": "prettier . --write",
+    "check:frozen": "node scripts/check-frozen-copy.mjs",
+    "check:pivot-content": "node scripts/check-pivot-content.mjs",
+    "check:pivot": "node scripts/check-pivot-invariants.mjs"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.2.8",
@@ -25,7 +28,6 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-hook-form": "^7.81.0",
-    "stripe": "^22.3.0",
     "tailwind-merge": "^3.6.0",
     "three": "0.182.0",
     "zod": "^4.4.3"

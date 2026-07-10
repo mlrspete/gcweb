@@ -6,17 +6,7 @@ import { siteContent } from "@/content/site";
 import { trackCTAClick } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
 
-const navLinks = siteContent.nav.links.map((link) => {
-  if (link.label === "Pricing") {
-    return { ...link, href: "#pricing" };
-  }
-
-  if (link.label === "Join Now") {
-    return { ...link, href: "#join" };
-  }
-
-  return link;
-});
+const navLinks = siteContent.nav.links;
 
 export function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);

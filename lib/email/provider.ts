@@ -1,9 +1,13 @@
-import type { JoinWaveSubmission } from "@/lib/validation/joinWaveSchema";
+import type {
+  PreliminaryResultCategory,
+  ReviewSystemApplicationValues,
+} from "@/lib/validation/reviewSystemApplicationSchema";
 
 import { sendResendEmail } from "./resend";
 
-export type JoinWaveLeadEmail = {
-  lead: JoinWaveSubmission;
+export type ReviewSystemApplicationEmail = {
+  application: ReviewSystemApplicationValues;
+  serverResultCategory: PreliminaryResultCategory;
   timestamp: string;
   sourcePage: string;
 };
@@ -19,7 +23,8 @@ export type EmailSendResult =
       error: string;
     };
 
-const subject = "New Growth Specialists Visibility Wave enquiry";
+const reviewSystemApplicationSubject =
+  "New Growth Specialists review system application";
 
 function escapeHtml(value: string) {
   return value
@@ -28,6 +33,10 @@ function escapeHtml(value: string) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+function escapeHtmlAttribute(value: string) {
+  return escapeHtml(value).replaceAll("`", "&#96;");
 }
 
 function formatValue(value: string | number | boolean | undefined) {
@@ -42,39 +51,60 @@ function formatValue(value: string | number | boolean | undefined) {
   return value && value.length > 0 ? value : "Not provided";
 }
 
-function createRows({ lead, timestamp, sourcePage }: JoinWaveLeadEmail) {
+function createReviewSystemRows({
+  application,
+  serverResultCategory,
+  timestamp,
+  sourcePage,
+}: ReviewSystemApplicationEmail) {
+  const selectedTools = application.fitCheck.tools?.join(", ");
+
   return [
-    ["Business name", lead.businessName],
-    ["Website", lead.website],
-    ["Google Business Profile link", lead.googleBusinessProfile],
-    ["Suburb / service area", lead.serviceArea],
-    ["Industry", lead.industry],
-    ["Current number of Google reviews", lead.currentGoogleReviews],
-    ["Approximate number of recent customers", lead.recentCustomers],
-    ["Selected package", lead.packageName],
-    ["Additional notes", lead.notes],
-    ["Compliance checkbox accepted", lead.complianceAccepted],
+    ["Business URL", application.fitCheck.businessUrl],
+    ["Industry", application.fitCheck.industry],
+    ["Customer-volume range", application.fitCheck.customerVolume],
+    ["Request method", application.fitCheck.requestMethod],
+    ["Selected tools", selectedTools],
+    ["Compliance accepted", application.fitCheck.complianceAccepted],
+    ["Client category", application.preliminaryResultCategory],
+    ["Recomputed server category", serverResultCategory],
+    ["Work email", application.contact.workEmail],
+    ["Contact name", application.contact.contactName],
+    ["Business name", application.contact.businessName],
+    ["Notes", application.contact.notes],
     ["Timestamp", timestamp],
     ["Source page", sourcePage],
   ] satisfies Array<[string, string | number | boolean | undefined]>;
 }
 
-function buildTextEmail(input: JoinWaveLeadEmail) {
-  return createRows(input)
+function buildReviewSystemTextEmail(input: ReviewSystemApplicationEmail) {
+  return createReviewSystemRows(input)
     .map(([label, value]) => `${label}: ${formatValue(value)}`)
     .join("\n");
 }
 
-function buildHtmlEmail(input: JoinWaveLeadEmail) {
-  const rows = createRows(input)
-    .map(
-      ([label, value]) => `
+function buildBusinessUrlCell(url: string) {
+  const escapedUrl = escapeHtml(url);
+  const escapedHref = escapeHtmlAttribute(url);
+
+  return `<a href="${escapedHref}" style="color:#092a3a;font-weight:700;">${escapedUrl}</a>`;
+}
+
+function buildReviewSystemHtmlEmail(input: ReviewSystemApplicationEmail) {
+  const rows = createReviewSystemRows(input)
+    .map(([label, value]) => {
+      const renderedValue =
+        label === "Business URL" && typeof value === "string"
+          ? buildBusinessUrlCell(value)
+          : escapeHtml(formatValue(value));
+
+      return `
         <tr>
           <th align="left" style="padding:10px 12px;border-bottom:1px solid #dff7ff;color:#061826;width:240px;">${escapeHtml(label)}</th>
-          <td style="padding:10px 12px;border-bottom:1px solid #dff7ff;color:#092a3a;">${escapeHtml(formatValue(value))}</td>
+          <td style="padding:10px 12px;border-bottom:1px solid #dff7ff;color:#092a3a;">${renderedValue}</td>
         </tr>
-      `,
-    )
+      `;
+    })
     .join("");
 
   return `
@@ -82,7 +112,7 @@ function buildHtmlEmail(input: JoinWaveLeadEmail) {
       <div style="max-width:720px;margin:0 auto;background:#fffcf6;border:1px solid #ffd1ca;border-radius:12px;overflow:hidden;">
         <div style="background:#061826;color:#fffcf6;padding:22px 24px;">
           <p style="margin:0;color:#bfefe3;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Growth Specialists</p>
-          <h1 style="margin:8px 0 0;font-size:22px;">Visibility Wave enquiry</h1>
+          <h1 style="margin:8px 0 0;font-size:22px;">Review system application</h1>
         </div>
         <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;">
           ${rows}
@@ -100,21 +130,29 @@ function getEmailConfig() {
   };
 }
 
-export async function sendJoinWaveLeadEmail(
-  input: JoinWaveLeadEmail,
+export async function sendReviewSystemApplicationEmail(
+  input: ReviewSystemApplicationEmail,
 ): Promise<EmailSendResult> {
   const config = getEmailConfig();
+  const { apiKey, from, to } = config;
   const isProduction = process.env.NODE_ENV === "production";
+  const emailConfigured = Boolean(apiKey && to && from);
 
-  if (!config.apiKey || !config.to || !config.from) {
+  if (!apiKey || !to || !from) {
     if (!isProduction) {
-      console.info("Growth Specialists lead captured in development mode", {
-        businessName: input.lead.businessName,
-        packageName: input.lead.packageName,
-        timestamp: input.timestamp,
-        sourcePage: input.sourcePage,
-        emailConfigured: Boolean(config.apiKey && config.to && config.from),
-      });
+      console.info(
+        "Growth Specialists review system application captured in development mode",
+        {
+          industry: input.application.fitCheck.industry,
+          customerVolume: input.application.fitCheck.customerVolume,
+          requestMethod: input.application.fitCheck.requestMethod,
+          toolCount: input.application.fitCheck.tools?.length ?? 0,
+          clientCategory: input.application.preliminaryResultCategory,
+          serverCategory: input.serverResultCategory,
+          timestamp: input.timestamp,
+          emailConfigured,
+        },
+      );
 
       return { ok: true, mode: "development" };
     }
@@ -127,17 +165,18 @@ export async function sendJoinWaveLeadEmail(
 
   try {
     const response = await sendResendEmail({
-      apiKey: config.apiKey,
-      from: config.from,
-      to: config.to,
-      subject,
-      html: buildHtmlEmail(input),
-      text: buildTextEmail(input),
+      apiKey,
+      from,
+      to,
+      subject: reviewSystemApplicationSubject,
+      html: buildReviewSystemHtmlEmail(input),
+      text: buildReviewSystemTextEmail(input),
+      replyTo: input.application.contact.workEmail,
     });
 
     return { ok: true, mode: "sent", id: response.id };
   } catch (error) {
-    console.error("Growth Specialists lead email failed", {
+    console.error("Growth Specialists review system application email failed", {
       error: error instanceof Error ? error.message : "Unknown email error",
       timestamp: input.timestamp,
     });

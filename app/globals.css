@@ -257,6 +257,14 @@ select {
     font-variant-numeric: tabular-nums;
   }
 
+  .accordion-content[data-state="open"] {
+    animation: accordion-content-down 240ms ease-out;
+  }
+
+  .accordion-content[data-state="closed"] {
+    animation: accordion-content-up 200ms ease-out;
+  }
+
   .gsap-ticker {
     width: 100%;
   }
@@ -305,6 +313,56 @@ select {
       0 22px 70px rgb(255 107 95 / 0.32);
   }
 
+  .review-flow-rail {
+    counter-reset: review-flow-node;
+  }
+
+  .review-flow-node {
+    counter-increment: review-flow-node;
+  }
+
+  .review-flow-node::after {
+    position: absolute;
+    top: 2.25rem;
+    bottom: -1rem;
+    left: 0.875rem;
+    width: 2px;
+    content: "";
+    background: linear-gradient(
+      180deg,
+      rgb(9 42 58 / 0.24),
+      rgb(191 239 227 / 0.44)
+    );
+  }
+
+  .review-flow-node:last-child::after {
+    display: none;
+  }
+
+  .review-journey-panel {
+    contain: paint;
+  }
+
+  .review-journey-phase {
+    min-width: 0;
+  }
+
+  .review-journey-customer-card,
+  .review-journey-work-module {
+    will-change: opacity, transform;
+  }
+
+  html[data-motion="reduced"] [data-journey-fish] {
+    display: none !important;
+  }
+
+  html[data-motion="reduced"] [data-customer-step],
+  html[data-motion="reduced"] [data-work-module],
+  html[data-motion="reduced"] [data-journey-current] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
   html[data-motion="reduced"] .gsap-reveal,
   html[data-motion="reduced"] .gsap-split-word,
   html[data-motion="reduced"] .gsap-parallax-float {
@@ -322,6 +380,30 @@ select {
 
   html[data-motion="reduced"] .gsap-ticker-item[aria-hidden="true"] {
     display: none;
+  }
+}
+
+@keyframes accordion-content-down {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+
+  to {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes accordion-content-up {
+  from {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+
+  to {
+    height: 0;
+    opacity: 0;
   }
 }
 
@@ -399,6 +481,11 @@ select {
   .section-reveal {
     opacity: 1;
     transform: none;
+  }
+
+  .accordion-content[data-state="open"],
+  .accordion-content[data-state="closed"] {
+    animation: none;
   }
 
   .motion-reduce-hide {

@@ -10,26 +10,39 @@ export type AccordionItem = {
   title: string;
   content: ReactNode;
   number?: string;
+  domId?: string;
 };
 
 export type AccordionProps = {
   items: AccordionItem[];
   defaultValue?: string;
+  value?: string;
+  onValueChange?: (value: string) => void;
   className?: string;
 };
 
-export function Accordion({ items, defaultValue, className }: AccordionProps) {
+export function Accordion({
+  items,
+  defaultValue,
+  value,
+  onValueChange,
+  className,
+}: AccordionProps) {
   return (
     <RadixAccordion.Root
       type="single"
       collapsible
       defaultValue={defaultValue}
+      value={value}
+      onValueChange={onValueChange}
       className={cn("border-t border-deep-ocean-navy/[0.14]", className)}
     >
       {items.map((item, index) => (
         <RadixAccordion.Item
           key={item.id}
+          id={item.domId}
           value={item.id}
+          data-faq-id={item.id}
           className="border-b border-deep-ocean-navy/[0.14]"
         >
           <RadixAccordion.Header>
@@ -58,8 +71,10 @@ export function Accordion({ items, defaultValue, className }: AccordionProps) {
               </span>
             </RadixAccordion.Trigger>
           </RadixAccordion.Header>
-          <RadixAccordion.Content className="overflow-hidden pb-5 pl-[3.25rem] pr-14 text-sm leading-7 text-abyss-blue data-[state=closed]:hidden sm:pb-6 sm:pl-[3.75rem] sm:pr-16">
-            {item.content}
+          <RadixAccordion.Content className="accordion-content overflow-hidden text-sm leading-7 text-abyss-blue">
+            <div className="pb-5 pl-[3.25rem] pr-14 sm:pb-6 sm:pl-[3.75rem] sm:pr-16">
+              {item.content}
+            </div>
           </RadixAccordion.Content>
         </RadixAccordion.Item>
       ))}
