@@ -305,6 +305,32 @@ select {
       0 22px 70px rgb(255 107 95 / 0.32);
   }
 
+  .review-flow-rail {
+    counter-reset: review-flow-node;
+  }
+
+  .review-flow-node {
+    counter-increment: review-flow-node;
+  }
+
+  .review-flow-node::after {
+    position: absolute;
+    top: 2.25rem;
+    bottom: -1rem;
+    left: 0.875rem;
+    width: 2px;
+    content: "";
+    background: linear-gradient(
+      180deg,
+      rgb(9 42 58 / 0.24),
+      rgb(191 239 227 / 0.44)
+    );
+  }
+
+  .review-flow-node:last-child::after {
+    display: none;
+  }
+
   html[data-motion="reduced"] .gsap-reveal,
   html[data-motion="reduced"] .gsap-split-word,
   html[data-motion="reduced"] .gsap-parallax-float {

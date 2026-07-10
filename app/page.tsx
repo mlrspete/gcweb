@@ -10,11 +10,11 @@ import { HowItWorksSection } from "@/components/sections/HowItWorksSection";
 import { OneServiceSection } from "@/components/sections/OneServiceSection";
 import { PackagesSection } from "@/components/sections/PackagesSection";
 import { PhilosophySection } from "@/components/sections/PhilosophySection";
+import { ReviewCollectionGapSection } from "@/components/sections/ReviewCollectionGapSection";
 import { SignalTicker } from "@/components/sections/SignalTicker";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SuitabilitySection } from "@/components/sections/SuitabilitySection";
-import { VisibilityGapSection } from "@/components/sections/VisibilityGapSection";
 import { WhyReviewsMatterSection } from "@/components/sections/WhyReviewsMatterSection";
 import { getCanonicalUrl, siteContent } from "@/content/site";
 
@@ -46,7 +46,7 @@ export default function Home() {
       <main>
         <HeroSection />
         <SignalTicker />
-        <VisibilityGapSection />
+        <ReviewCollectionGapSection />
         <HowItWorksSection />
         <OneServiceSection />
         <CampaignExampleSection />
