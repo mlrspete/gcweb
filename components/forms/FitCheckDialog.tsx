@@ -385,7 +385,6 @@ export function FitCheckDialog({
   const [resetKey, setResetKey] = useState(0);
   const hasStartedRef = useRef(false);
   const submissionErrorRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const analyticsInput = useMemo(
     () => getAnalyticsInput(fitCheckValues, resultCategory, ctaLocation),
@@ -414,7 +413,6 @@ export function FitCheckDialog({
       return;
     }
 
-    window.setTimeout(() => triggerRef.current?.focus(), 20);
   }
 
   function handleStarted() {
@@ -510,7 +508,6 @@ export function FitCheckDialog({
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Trigger asChild>
         <button
-          ref={triggerRef}
           type="button"
           data-fit-check-trigger
           className={cn(
@@ -526,10 +523,6 @@ export function FitCheckDialog({
         <Dialog.Overlay className="fixed inset-0 z-50 bg-deep-ocean-navy/76 backdrop-blur-sm" />
         <Dialog.Content
           data-fit-check-step={step}
-          onCloseAutoFocus={(event) => {
-            event.preventDefault();
-            triggerRef.current?.focus();
-          }}
           className={cn(
             "fixed inset-x-3 bottom-3 top-3 z-50 flex overflow-hidden rounded-lg border border-pearl-white/[0.16] bg-deep-ocean-navy text-pearl-white shadow-ocean-soft outline-none",
             "sm:left-1/2 sm:top-1/2 sm:bottom-auto sm:max-h-[min(90dvh,760px)] sm:w-[min(45rem,calc(100vw-2rem))] sm:-translate-x-1/2 sm:-translate-y-1/2",

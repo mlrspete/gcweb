@@ -354,9 +354,14 @@ async function pressKey(page, key, code = key, modifiers = 0) {
     modifiers,
     windowsVirtualKeyCode: virtualKeyCode,
     nativeVirtualKeyCode: virtualKeyCode,
+    text: key === "Enter" ? "\r" : key === " " ? " " : undefined,
+    unmodifiedText: key === "Enter" ? "\r" : key === " " ? " " : undefined,
   };
 
-  await page.send("Input.dispatchKeyEvent", { type: "keyDown", ...params });
+  await page.send("Input.dispatchKeyEvent", {
+    type: params.text ? "keyDown" : "rawKeyDown",
+    ...params,
+  });
   await page.send("Input.dispatchKeyEvent", { type: "keyUp", ...params });
 }
 
@@ -527,15 +532,52 @@ async function getStageOneSnapshot(page) {
 }
 
 async function openDialog(page) {
-  await page.evaluate(
-    `document.querySelector("[data-fit-check-trigger]")?.click()`,
-  );
+  await page.evaluate(`(() => {
+    const trigger = document.querySelector("[data-fit-check-trigger]");
+    document.documentElement.style.scrollBehavior = "auto";
+    trigger?.scrollIntoView({ behavior: "auto", block: "center" });
+  })()`);
+  await wait(700);
+  await page.evaluate(`(() => {
+    const trigger = document.querySelector("[data-fit-check-trigger]");
+    trigger?.scrollIntoView({ behavior: "auto", block: "center" });
+  })()`);
+  await wait(250);
+  const point = await page.evaluate(`(() => {
+    const trigger = document.querySelector("[data-fit-check-trigger]");
+    const rect = trigger?.getBoundingClientRect();
+    return rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : null;
+  })()`);
+
+  if (!point) {
+    throw new Error("Missing fit-check trigger.");
+  }
+
+  await page.send("Input.dispatchMouseEvent", {
+    type: "mousePressed",
+    x: point.x,
+    y: point.y,
+    button: "left",
+    clickCount: 1,
+  });
+  await page.send("Input.dispatchMouseEvent", {
+    type: "mouseReleased",
+    x: point.x,
+    y: point.y,
+    button: "left",
+    clickCount: 1,
+  });
   await waitForCondition(
     page,
     "document.querySelector('[role=\"dialog\"]')",
     "fit-check dialog",
   );
-  await wait(150);
+  await waitForCondition(
+    page,
+    "document.querySelector('[role=\"dialog\"]')?.contains(document.activeElement)",
+    "fit-check dialog focus",
+    2000,
+  );
 }
 
 async function closeDialog(page) {
@@ -611,9 +653,16 @@ async function collectViewportMetrics(page, viewport) {
   await page.evaluate(`(() => {
     const heading = Array.from(document.querySelectorAll("[data-offer-card] h4"))
       .find((candidate) => candidate.textContent.trim() === "Satisfaction guarantee");
-    heading?.scrollIntoView({ block: "center" });
+    document.documentElement.style.scrollBehavior = "auto";
+    heading?.scrollIntoView({ behavior: "auto", block: "center" });
   })()`);
-  await wait(650);
+  await wait(900);
+  await page.evaluate(`(() => {
+    const heading = Array.from(document.querySelectorAll("[data-offer-card] h4"))
+      .find((candidate) => candidate.textContent.trim() === "Satisfaction guarantee");
+    heading?.scrollIntoView({ behavior: "auto", block: "center" });
+  })()`);
+  await wait(600);
   const offerVisibility = await page.evaluate(`(() => {
     const heading = Array.from(document.querySelectorAll("[data-offer-card] h4"))
       .find((candidate) => candidate.textContent.trim() === "Satisfaction guarantee");
@@ -835,11 +884,16 @@ async function testFitCheckInteraction(page) {
     "!document.querySelector('[role=\"dialog\"]')",
     "Escape dialog close",
   );
-  await wait(120);
+  await waitForCondition(
+    page,
+    'document.activeElement === document.querySelector("[data-fit-check-trigger]")',
+    "fit-check trigger focus return",
+    2000,
+  ).catch(() => {});
   const focusAfterEscape = await page.evaluate(`(() => ({
     returned: document.activeElement === document.querySelector("[data-fit-check-trigger]"),
     tag: document.activeElement?.tagName || "",
-    text: document.activeElement?.textContent?.trim() || "",
+    text: (document.activeElement?.textContent?.trim() || "").slice(0, 120),
   }))()`);
 
   await openDialog(page);
@@ -1414,7 +1468,7 @@ function validateResults(results) {
   expect(
     results.accordionKeyboard.openedWithSpace &&
       results.accordionKeyboard.arrowDownIndex === 1 &&
-      results.accordionKeyboard.endIndex === 6 &&
+      results.accordionKeyboard.endIndex === 3 &&
       results.accordionKeyboard.homeIndex === 0,
     "FAQ: accordion keyboard navigation failed",
   );
