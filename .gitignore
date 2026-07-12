@@ -27,6 +27,9 @@ tsconfig.tsbuildinfo
 # vercel
 .vercel
 
+# netlify
+.netlify
+
 # system
 .DS_Store
 Thumbs.db
