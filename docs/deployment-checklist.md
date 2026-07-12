@@ -1,69 +1,87 @@
 # Deployment Checklist
 
-## Install And Validate
+Last audited: 2026-07-12
 
-- Install dependencies with `npm install`.
-- Run `npm run format`.
-- Run `npm run typecheck`.
-- Run `npm run lint`.
-- Run `npm run check:frozen`.
-- Run `npm run check:pivot-content`.
-- Run `npm run check:pivot`.
-- Run `npm run build`.
+## Code And Local Gates
 
-## Environment And Preview
+- [x] Feature branch is pushed.
+- [x] `npm ci` succeeds.
+- [x] `npm run validate` succeeds.
+- [x] Optimized production build starts locally.
+- [x] `npm run qa:pivot` passes locally.
+- [x] No public Stripe checkout code or route remains.
+- [x] Legal pages, sitemap and robots build successfully.
+- [x] Milestones 0-8 and the source-of-truth plan are committed.
+- [ ] GitHub validation workflow passes for the final release commit.
 
-- Configure the variables in `docs/env-checklist.md` without exposing values.
-- Set `NEXT_PUBLIC_SITE_URL` to the intended origin and redeploy after changing
-  it.
-- Confirm preview deployments return a disallow-all robots policy.
-- Confirm the production deployment allows public pages and disallows `/api/`.
+## Vercel Environment
 
-## Email Provider
+- [ ] Preview `NEXT_PUBLIC_SITE_URL` is configured.
+- [x] Production `NEXT_PUBLIC_SITE_URL` is present.
+- [ ] Preview and Production `LEAD_TO_EMAIL` are configured.
+- [ ] Preview and Production `LEAD_FROM_EMAIL` are configured.
+- [ ] Preview and Production have `RESEND_API_KEY` or
+      `EMAIL_PROVIDER_API_KEY`.
+- [ ] Environments are redeployed after configuration changes.
+- [ ] Intended Growth Specialists production domain is confirmed.
+- [ ] Obsolete `grubclub.gg` Vercel aliases are removed.
 
-- Verify `LEAD_FROM_EMAIL` with Resend.
-- Confirm `LEAD_TO_EMAIL` is the intended recipient inbox.
-- Submit a controlled test application with synthetic contact data.
-- Confirm the subject is `New Growth Specialists review system application`.
-- Confirm the message includes fit-check answers, result categories, contact
-  details, timestamp, source page and compliance confirmation.
-- Confirm honeypot submissions return success and send no email.
+Do not print environment values in commands, screenshots, CI logs or reports.
 
-## Metadata And Indexing
+## Preview
 
-- Check `/`, `/privacy`, `/terms` and `/satisfaction-guarantee`.
-- Check `/sitemap.xml` contains exactly those four public routes.
-- Check `/robots.txt` uses the environment-derived sitemap URL.
-- Confirm the root title, title template, canonical, description, Open Graph and
-  Twitter values match `content/site.ts`.
-- Confirm policy pages have unique titles and canonicals.
-- Confirm `/og-growth-specialists.png` is a legible `1200x630` image.
-- Validate the root JSON-LD serialization and the `$299 AUD` service offer.
-- Confirm JSON-LD contains no ratings, reviews, counts, address, phone, awards or
-  promised outcomes.
-- Open the BrightLocal, Google ranking guidance and Google contribution policy
-  links from the rendered page.
+- [x] Commit `1212415` has a READY protected preview.
+- [x] Root and three policy pages return 200 through authenticated Vercel QA.
+- [x] Sitemap and robots return 200.
+- [x] Preview robots disallow indexing.
+- [x] Metadata, canonical and JSON-LD are valid.
+- [x] Responsive browser QA passes at all six target widths.
+- [x] Frozen-zone, fit-check, compliance hash and reduced-motion checks pass.
+- [x] `/api/checkout` returns 404.
+- [x] Console is clean and analytics contain no PII keys.
+- [x] Stage One sends no Fetch/XHR request or request body.
 
-## Analytics And Privacy
+Preview URL: `https://gcweb-8rnqkej32-mlrspetes-projects.vercel.app`
 
-- Inspect the event sequence against `docs/analytics-events.md`.
-- Confirm fixed CTA labels use `destination` values for the review-system offer
-  or journey.
-- Confirm payloads contain no URL, email, contact name, business name, notes,
-  arbitrary text or raw form object.
-- Confirm the page works without GA, GTM or any analytics environment variable.
+## Real Email And Honeypot
 
-## Manual QA
+- [ ] Submit a controlled application with synthetic data.
+- [ ] Receive it at the configured destination.
+- [ ] Confirm subject is `New Growth Specialists review system application`.
+- [ ] Confirm reply-to is the synthetic work email.
+- [ ] Confirm all expected fields and HTML escaping.
+- [ ] Confirm no secret value appears.
+- [ ] Confirm success appears only after provider success.
+- [ ] Submit the honeypot case and confirm no email is delivered.
 
-- Check one H1 and a logical heading order.
-- Check 360px, 390px, 768px, 1024px, 1440px and 1920px viewports.
-- Check reduced-motion mode and keyboard navigation.
-- Check the nav, fit-check dialog, FAQ accordion and Compliance hash link.
-- Check Chrome, Safari, Firefox and iOS Safari before launch.
-- Confirm Stage One has no name, email or phone fields.
+These checks are blocked until the required email variables are configured.
 
-## Launch Gate
+## Production Release
 
-- Complete Australian legal review before accepting payment invitations.
-- Complete live email, accessibility, performance and cross-browser checks.
-- Do not add rating schema, fake testimonials or promised review outcomes.
+- [ ] Australian legal review is complete before accepting payment invitations.
+- [ ] Required environment and email gates pass.
+- [ ] Final PR is reviewed and GitHub validation passes.
+- [ ] Feature branch is merged through the normal repository workflow.
+- [ ] Vercel production deployment is READY on the intended domain.
+- [ ] Production smoke tests independently pass.
+- [ ] Controlled production email test passes when appropriate.
+- [ ] New production deployment ID and commit are recorded.
+
+Production release is currently blocked. Preview success must not be treated as
+production success.
+
+## Rollback
+
+Current production ID: `dpl_64wyTfzLVE7vWZjpAVwq9r2TexpT`
+
+Previous production ID: `dpl_2tvSMWsKPaFGNGbydpCdXpCjJyUU`
+
+Rollback command:
+
+```text
+vercel rollback <deployment-id-or-url> --yes
+```
+
+Rollback for form delivery failure, runtime crash, severe layout/frozen-hero
+regression, PII analytics, checkout-route reappearance or material compliance
+copy drift.

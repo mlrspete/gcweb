@@ -10,6 +10,7 @@ const baseUrl = (process.env.QA_URL || "http://127.0.0.1:3000").replace(
   /\/$/,
   "",
 );
+const vercelBypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET || "";
 const debugPort = Number(process.env.CHROME_DEBUG_PORT || 9355);
 
 const viewports = [
@@ -852,6 +853,7 @@ async function testFitCheckInteraction(page) {
   await openDialog(page);
 
   const initial = await getStageOneSnapshot(page);
+  const stageOneNetworkStart = page.events.length;
   await fillStageOne(page, { volumeIndex: 1, requestIndex: 0 });
   await submitStageOne(page);
   await waitForCondition(
@@ -859,6 +861,19 @@ async function testFitCheckInteraction(page) {
     "document.querySelector('[data-fit-result=\"potential-fit\"]')",
     "potential-fit result",
   );
+  const stageOneRequests = page.events
+    .slice(stageOneNetworkStart)
+    .filter(
+      (event) =>
+        event.method === "Network.requestWillBeSent" &&
+        ["Fetch", "XHR"].includes(event.params?.type),
+    );
+  const stageOneNetwork = {
+    requestCount: stageOneRequests.length,
+    containsPostData: stageOneRequests.some((event) =>
+      Boolean(event.params?.request?.postData),
+    ),
+  };
 
   const potentialResult = await page.evaluate(`(() => ({
     category: document.querySelector("[data-fit-result]")?.dataset.fitResult || "",
@@ -968,6 +983,7 @@ async function testFitCheckInteraction(page) {
 
   return {
     initial,
+    stageOneNetwork,
     potentialResult,
     contact,
     focusTrapHeld,
@@ -1429,6 +1445,11 @@ function validateResults(results) {
     "fit-check: Stage One phone field found",
   );
   expect(
+    fit.stageOneNetwork.requestCount === 0 &&
+      !fit.stageOneNetwork.containsPostData,
+    "fit-check: Stage One sent form data over the network",
+  );
+  expect(
     fit.initial.activeName === "businessUrl",
     "fit-check: initial focus did not reach business URL",
   );
@@ -1580,7 +1601,15 @@ function validateResults(results) {
 }
 
 async function getStatus(url) {
-  const response = await fetch(url, { redirect: "manual" });
+  const headers = vercelBypassSecret
+    ? {
+        "x-vercel-protection-bypass": vercelBypassSecret,
+      }
+    : undefined;
+  const response = await fetch(url, {
+    redirect: "manual",
+    headers,
+  });
   return response.status;
 }
 
@@ -1648,6 +1677,14 @@ async function main() {
 
     await page.send("Page.enable");
     await page.send("Runtime.enable");
+    await page.send("Network.enable");
+    if (vercelBypassSecret) {
+      await page.send("Network.setExtraHTTPHeaders", {
+        headers: {
+          "x-vercel-protection-bypass": vercelBypassSecret,
+        },
+      });
+    }
     await page.send("Log.enable");
     await page.send("Performance.enable");
     await page.send("HeapProfiler.enable");

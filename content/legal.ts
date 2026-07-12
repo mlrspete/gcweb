@@ -1,7 +1,7 @@
 import { reviewSystemContent } from "@/content/reviewSystem";
 import { siteContent } from "@/content/site";
 
-// TODO: Obtain Australian legal review before accepting payments.
+// Australian legal review remains a launch gate before accepting payments.
 
 export type LegalSection = {
   heading: string;
