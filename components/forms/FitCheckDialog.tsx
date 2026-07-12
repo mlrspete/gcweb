@@ -412,7 +412,6 @@ export function FitCheckDialog({
       trackFitCheckOpened(ctaLocation);
       return;
     }
-
   }
 
   function handleStarted() {

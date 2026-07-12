@@ -53,7 +53,6 @@ export function SiteHeader() {
         <a
           href="#hero"
           className="rounded-full text-lg font-extrabold tracking-normal focus-visible:outline-reef-coral"
-          aria-label="Growth Specialists home"
         >
           {siteContent.wordmark}
         </a>

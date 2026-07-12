@@ -2,8 +2,8 @@
 
 import type { ReactNode } from "react";
 
-import { AnimatedCounter, Reveal } from "@/components/motion";
 import { FitCheckDialog } from "@/components/forms/FitCheckDialog";
+import { AnimatedCounter, Reveal } from "@/components/motion";
 import { Eyebrow } from "@/components/ui";
 import { reviewSystemContent } from "@/content/reviewSystem";
 import { useGSAPContext } from "@/hooks/useGSAPContext";

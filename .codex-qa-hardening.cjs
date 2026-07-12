@@ -10,6 +10,7 @@ const baseUrl = (process.env.QA_URL || "http://127.0.0.1:3000").replace(
   /\/$/,
   "",
 );
+const vercelBypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET || "";
 const debugPort = Number(process.env.CHROME_DEBUG_PORT || 9355);
 
 const viewports = [
@@ -354,8 +355,8 @@ async function pressKey(page, key, code = key, modifiers = 0) {
     modifiers,
     windowsVirtualKeyCode: virtualKeyCode,
     nativeVirtualKeyCode: virtualKeyCode,
-    text: key === "Enter" ? "\r" : key === " " ? " " : undefined,
-    unmodifiedText: key === "Enter" ? "\r" : key === " " ? " " : undefined,
+    text: key === "Enter" ? "\r" : undefined,
+    unmodifiedText: key === "Enter" ? "\r" : undefined,
   };
 
   await page.send("Input.dispatchKeyEvent", {
@@ -532,6 +533,12 @@ async function getStageOneSnapshot(page) {
 }
 
 async function openDialog(page) {
+  await waitForCondition(
+    page,
+    'document.querySelector("[data-fit-check-trigger]")',
+    "deferred fit-check trigger",
+    6000,
+  );
   await page.evaluate(`(() => {
     const trigger = document.querySelector("[data-fit-check-trigger]");
     document.documentElement.style.scrollBehavior = "auto";
@@ -846,6 +853,7 @@ async function testFitCheckInteraction(page) {
   await openDialog(page);
 
   const initial = await getStageOneSnapshot(page);
+  const stageOneNetworkStart = page.events.length;
   await fillStageOne(page, { volumeIndex: 1, requestIndex: 0 });
   await submitStageOne(page);
   await waitForCondition(
@@ -853,6 +861,19 @@ async function testFitCheckInteraction(page) {
     "document.querySelector('[data-fit-result=\"potential-fit\"]')",
     "potential-fit result",
   );
+  const stageOneRequests = page.events
+    .slice(stageOneNetworkStart)
+    .filter(
+      (event) =>
+        event.method === "Network.requestWillBeSent" &&
+        ["Fetch", "XHR"].includes(event.params?.type),
+    );
+  const stageOneNetwork = {
+    requestCount: stageOneRequests.length,
+    containsPostData: stageOneRequests.some((event) =>
+      Boolean(event.params?.request?.postData),
+    ),
+  };
 
   const potentialResult = await page.evaluate(`(() => ({
     category: document.querySelector("[data-fit-result]")?.dataset.fitResult || "",
@@ -962,6 +983,7 @@ async function testFitCheckInteraction(page) {
 
   return {
     initial,
+    stageOneNetwork,
     potentialResult,
     contact,
     focusTrapHeld,
@@ -990,6 +1012,20 @@ async function testComplianceHash(page) {
     1900,
   );
 
+  await waitForCondition(
+    page,
+    `(() => {
+      const item = document.getElementById("faq-compliance");
+      const trigger = item?.querySelector("button");
+      const rect = item?.getBoundingClientRect();
+      return item?.dataset.state === "open" &&
+        trigger?.getAttribute("aria-expanded") === "true" &&
+        rect && rect.top >= 0 && rect.top < window.innerHeight * 0.65;
+    })()`,
+    "compliance FAQ viewport position",
+    6000,
+  ).catch(() => {});
+
   return page.evaluate(`(() => {
     const item = document.getElementById("faq-compliance");
     const trigger = item?.querySelector("button");
@@ -1011,9 +1047,15 @@ async function testAccordionKeyboard(page) {
   await page.evaluate(
     `document.querySelectorAll(${JSON.stringify(selector)})[0]?.focus()`,
   );
-  await pressKey(page, " ", "Space");
+  await waitForCondition(
+    page,
+    `document.activeElement === document.querySelectorAll(${JSON.stringify(selector)})[0]`,
+    "first FAQ trigger focus",
+    2000,
+  ).catch(() => {});
+  await pressKey(page, "Enter", "Enter");
   await wait(100);
-  const openedWithSpace = await page.evaluate(
+  const openedWithEnter = await page.evaluate(
     `document.querySelectorAll(${JSON.stringify(selector)})[0]?.getAttribute("aria-expanded") === "true"`,
   );
 
@@ -1030,7 +1072,7 @@ async function testAccordionKeyboard(page) {
     `Array.from(document.querySelectorAll(${JSON.stringify(selector)})).indexOf(document.activeElement)`,
   );
 
-  return { openedWithSpace, arrowDownIndex, endIndex, homeIndex };
+  return { openedWithEnter, arrowDownIndex, endIndex, homeIndex };
 }
 
 async function testReducedMotion(page) {
@@ -1403,6 +1445,11 @@ function validateResults(results) {
     "fit-check: Stage One phone field found",
   );
   expect(
+    fit.stageOneNetwork.requestCount === 0 &&
+      !fit.stageOneNetwork.containsPostData,
+    "fit-check: Stage One sent form data over the network",
+  );
+  expect(
     fit.initial.activeName === "businessUrl",
     "fit-check: initial focus did not reach business URL",
   );
@@ -1475,7 +1522,7 @@ function validateResults(results) {
     `compliance hash: FAQ 05 did not enter the viewport (top ${results.complianceHash.itemTop}px)`,
   );
   expect(
-    results.accordionKeyboard.openedWithSpace &&
+    results.accordionKeyboard.openedWithEnter &&
       results.accordionKeyboard.arrowDownIndex === 1 &&
       results.accordionKeyboard.endIndex === 3 &&
       results.accordionKeyboard.homeIndex === 0,
@@ -1554,7 +1601,15 @@ function validateResults(results) {
 }
 
 async function getStatus(url) {
-  const response = await fetch(url, { redirect: "manual" });
+  const headers = vercelBypassSecret
+    ? {
+        "x-vercel-protection-bypass": vercelBypassSecret,
+      }
+    : undefined;
+  const response = await fetch(url, {
+    redirect: "manual",
+    headers,
+  });
   return response.status;
 }
 
@@ -1622,6 +1677,14 @@ async function main() {
 
     await page.send("Page.enable");
     await page.send("Runtime.enable");
+    await page.send("Network.enable");
+    if (vercelBypassSecret) {
+      await page.send("Network.setExtraHTTPHeaders", {
+        headers: {
+          "x-vercel-protection-bypass": vercelBypassSecret,
+        },
+      });
+    }
     await page.send("Log.enable");
     await page.send("Performance.enable");
     await page.send("HeapProfiler.enable");
