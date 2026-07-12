@@ -605,6 +605,7 @@ async function collectViewportMetrics(page, viewport) {
   );
 
   const snapshot = await getRootSnapshot(page);
+  const screenshotPath = await captureScreenshot(page, viewport.label);
   let mobileMenu = null;
 
   if (viewport.width < 1024) {
@@ -619,7 +620,10 @@ async function collectViewportMetrics(page, viewport) {
       expanded: document.querySelector('button[aria-controls="mobile-menu"]')?.getAttribute("aria-expanded"),
     }))()`);
 
-    const screenshotPath = await captureScreenshot(page, viewport.label);
+    const menuScreenshotPath = await captureScreenshot(
+      page,
+      `${viewport.label}-menu`,
+    );
     await pressKey(page, "Escape", "Escape");
     await wait(120);
 
@@ -635,14 +639,19 @@ async function collectViewportMetrics(page, viewport) {
       await wait(80);
     }
 
-    mobileMenu = { ...opened, ...closedWithEscape, screenshotPath };
+    mobileMenu = {
+      ...opened,
+      ...closedWithEscape,
+      screenshotPath,
+      menuScreenshotPath,
+    };
   } else {
     mobileMenu = {
       open: false,
       expanded: "false",
       closed: true,
       focusReturned: true,
-      screenshotPath: await captureScreenshot(page, viewport.label),
+      screenshotPath,
     };
   }
 
